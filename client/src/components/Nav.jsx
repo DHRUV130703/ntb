@@ -1,113 +1,78 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { nav, brand, founders } from '../content/site.js';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { chapters } from '../content/site.js';
+import { useUi } from '../state/ui.jsx';
 
+/** vs-goods style: three glass pill groups, and a compact dropdown under "Menu". */
 export default function Nav() {
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const { pathname, hash } = useLocation();
-  const lastY = useRef(0);
-  const menuBtn = useRef(null);
-  const firstLink = useRef(null);
+  const { openContact } = useUi();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const wrap = useRef(null);
 
-  // Close the menu on navigation.
-  useEffect(() => setOpen(false), [pathname, hash]);
-
-  // Hide the nav pill while scrolling down, show it when scrolling up.
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setHidden(y > 240 && y > lastY.current + 4);
-      if (y < lastY.current - 4 || y < 240) setHidden(false);
-      lastY.current = y;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Lock scroll, close on Escape, move focus while the menu is open.
   useEffect(() => {
     if (!open) return;
-    document.body.style.overflow = 'hidden';
-    const t = setTimeout(() => firstLink.current?.focus(), 250);
     const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    const onClick = (e) => !wrap.current?.contains(e.target) && setOpen(false);
     window.addEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onClick);
     return () => {
-      document.body.style.overflow = '';
-      clearTimeout(t);
       window.removeEventListener('keydown', onKey);
-      menuBtn.current?.focus();
+      window.removeEventListener('pointerdown', onClick);
     };
   }, [open]);
 
+  const goTo = (id) => {
+    setOpen(false);
+    if (pathname !== '/') navigate(`/#${id}`);
+    else document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <>
-      <header className={`nav ${hidden && !open ? 'nav--hidden' : ''}`}>
-        <div className="nav__left">
-          <button
-            ref={menuBtn}
-            className="nav__menu-btn"
-            aria-expanded={open}
-            aria-controls="site-menu"
-            onClick={() => setOpen((o) => !o)}
-          >
-            {open ? 'Close' : 'Menu'}
-            <span className="plus" aria-hidden="true">
-              {open ? '[–]' : '[+]'}
-            </span>
-          </button>
-          <Link className="nav__quick" to="/what-we-do">
-            What we do
-          </Link>
-          <Link className="nav__quick" to="/work">
-            Work
-          </Link>
-        </div>
+    <header className="nav">
+      <div className="nav__group nav__group--left" ref={wrap}>
+        <button className="nav__menu" aria-expanded={open} aria-controls="nav-menu" onClick={() => setOpen((o) => !o)}>
+          {open ? 'Close' : 'Menu'}
+          <span aria-hidden="true">{open ? '[–]' : '[+]'}</span>
+        </button>
+        <button className="nav__link" onClick={() => goTo('capabilities')}>
+          What we do
+        </button>
 
-        <Link to="/" className="nav__logo" aria-label="NOT TO BRAG home">
-          <img src="/brand/ntb-mark-ink.png" alt="" width="56" height="30" />
-          <span className="nav__logo-text">
-            NOT TO BRAG<span className="mark">®</span>
-          </span>
-        </Link>
-
-        <div className="nav__right">
-          <Link className="nav__cta" to="/contact">
-            Let’s Talk
-          </Link>
-        </div>
-      </header>
-
-      <div id="site-menu" className={`menu ${open ? 'menu--open' : ''}`} aria-hidden={!open} inert={open ? undefined : ''}>
-        <ul className="menu__list">
-          {nav.map((item, i) => (
-            <li key={item.to}>
-              <NavLink
-                ref={i === 0 ? firstLink : undefined}
-                to={item.to}
-                end
-                style={{ transitionDelay: open ? `${80 + i * 55}ms` : '0ms' }}
-              >
-                {item.label}
-                <small>0{i + 1}</small>
-              </NavLink>
-            </li>
+        <div id="nav-menu" className={`dropdown ${open ? 'is-open' : ''}`} inert={open ? undefined : ''}>
+          {chapters.map((c, i) => (
+            <button key={c.id} className="dropdown__row" style={{ '--i': i }} onClick={() => goTo(c.id)}>
+              {c.label}
+              <span className="dropdown__no">0{i + 1}</span>
+            </button>
           ))}
-        </ul>
-        <div className="menu__foot">
-          <span>{brand.tagline}</span>
-          <span style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            {founders.map((f) => (
-              <a key={f.id} href={`mailto:${f.email}`}>
-                {f.email}
-              </a>
-            ))}
-            <a href={brand.instagram.url} target="_blank" rel="noreferrer">
-              Instagram
-            </a>
-          </span>
+          <button
+            className="dropdown__row dropdown__row--cta"
+            style={{ '--i': chapters.length }}
+            onClick={() => {
+              setOpen(false);
+              openContact();
+            }}
+          >
+            Let’s Talk
+            <span className="dropdown__pill">Now booking</span>
+          </button>
         </div>
       </div>
-    </>
+
+      <Link to="/" className="nav__logo" aria-label="NOT TO BRAG, home" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <img src="/brand/ntb-mark-ink.png" alt="" width="52" height="28" />
+        <span className="nav__word">
+          NOT TO BRAG<sup>®</sup>
+        </span>
+      </Link>
+
+      <div className="nav__group nav__group--right">
+        <button className="nav__cta" onClick={() => openContact()}>
+          Let’s Talk
+        </button>
+      </div>
+    </header>
   );
 }

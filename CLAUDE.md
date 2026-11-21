@@ -15,7 +15,8 @@ in the same turn.
 - Philosophy: *We don't just create ideas. We help turn them into something meaningful for businesses.*
 - Three capabilities: **01 Creative & Marketing**, **02 Creators & Collaborations**,
   **03 AI & Business Intelligence**.
-- Pages: Home, What We Do, Our Work, About Us, Our Approach, Contact (+ FAQ, footer).
+- Site structure (v2, see "Redesign v2"): **one scrolling page** + a Contact drawer. The copy deck's
+  six "pages" become chapters of that page; deep detail lives in drawers, not new pages.
 
 ### Founders (both 23)
 
@@ -44,20 +45,87 @@ Photos: `client/public/images/founders/riddhi.jpg`, `dhruv.jpg` (real photos sup
 7. Copy: confident, human, clear, professional.
 8. Any demo numbers (e.g. the order dashboard on the AI section) must be visibly marked as demo data.
 
-## Design direction
+## Redesign v2 — spec (status: APPROVED and BUILT 2026-11-21)
 
-- Layout/interaction reference: https://vs-goods.store/ — floating rounded white nav pill with a
-  `Menu [+]` button, big medium-weight grotesk type, warm off-white canvas, charcoal sections,
-  rounded cards with pastel tags, split buttons with an arrow cell, marquee strips, large
-  uppercase hover list, tilted scattered cards.
-- AI section content/visual reference: https://dhruv-studio.vercel.app/ — workflow node diagrams
-  (trigger → AI step → app update), live order-tracking dashboard demo, 4-step build process.
-- Brand colours (sampled from the logo): olive `#6C6847`, cream `#F1E6D8`. Canvas `#ECE9E2`,
-  ink `#222423`. Accents: terracotta `#E8734A` (Creative), pink `#EBA6D9` (Creators),
-  periwinkle `#7C83EB` (AI), lime `#C6E36B`.
-- Font: Figtree (self-hosted via `@fontsource-variable/figtree`), stand-in for Roobert.
-- Logo assets: `client/public/brand/` (from the founders' NTB logo; olive bg, cream letters).
-  Gmail/Workspace logo exports are in `out/` (300×100 for the Workspace custom logo slot).
+Code map: `client/src/pages/Home.jsx` (all chapters), `components/Nav.jsx` (glass groups +
+dropdown), `components/FloatingStack.jsx` (cookie + status cards), `components/Sheets.jsx`
+(contact / service / founder drawers), `components/Visuals.jsx` (CSS mockup objects),
+`components/Demos.jsx` (workflow + order dashboard), `state/ui.jsx` (sheet + consent state;
+consent key `ntb-consent` in localStorage; Vercel Analytics injected only after "Accept all" in
+production — **Web Analytics must be enabled in the Vercel dashboard** for data to appear).
+Short chapter copy lives in `story` / `chapters` at the end of `content/site.js`.
+
+v1 (six pages, every list shown at once, giant type everywhere) was rejected as "all over the
+place". v2 is designed the way vs-goods.store is: one confident page, few words per screen,
+detail only when the visitor asks for it.
+
+### Principles
+
+1. **One page, one story.** Home is the whole site. No page-to-page jumping. Contact, service
+   detail and founder detail open as drawers/sheets over the page; closing returns you to where
+   you were. Old URLs (`/what-we-do`, `/about`, `/approach`, `/work`, `/contact`) redirect to the
+   matching chapter or open the drawer, so links never 404.
+2. **Progressive disclosure.** Each chapter says one thing in ≤ 2 lines. Service lists, process
+   detail and FAQ sit behind a click (drawer, hover preview, accordion). Never more than ~40 words
+   of body copy visible per screen.
+3. **Restraint in type.** Headlines 30–56px, medium weight, sentence case. Only two moments are
+   huge: the uppercase starting-point list and the footer wordmark.
+4. **Objects, not paragraphs.** Ideas are carried by cards: product-style cards, tilted floating
+   cards, pill chips with avatars, a sticky status card. Copy labels the objects.
+5. **One action everywhere:** "Let's Talk" opens the Contact drawer from any point on the page.
+
+### Narrative (chapters on the single page)
+
+| # | Chapter | What the visitor sees (vs-goods pattern it borrows) | Copy shown |
+|---|---|---|---|
+| 0 | **Nav** | Glassy translucent pill groups: left `Menu [+]` + "Work with us"; centre NTB mark + wordmark; right "Let's Talk". Menu opens a **small stacked dropdown of white rows** under the button (not full-screen), jumping to chapters. | — |
+| 1 | **Hero** | Full-bleed olive stage with slowly drifting tilted tiles (brand board, creator chip, AI flow node, dashboard). Headline small, bottom-left, 2 lines. One split button. Bottom-right: floating card stack (see 9). | "Creative thinking. Intelligent technology. Meaningful growth." + "Independent creative & technology studio, Mumbai." |
+| 2 | **Three capabilities** | Horizontal rail of 3 large product-style cards (visual on top, white info strip with title + one line + coloured tag). Click → **service drawer** with that capability's full list + "Discuss this" button. | Title + one line each. Lists only in drawer. |
+| 3 | **Pick a starting point** | Centred uppercase list, grey → ink on hover, a small preview card follows the cursor (like "MOCKUP LIBRARY"). BRANDING · CONTENT · CREATORS · AI AGENTS · DASHBOARDS. Click opens Contact drawer pre-filled. | Eyebrow "Where should we start?" |
+| 4 | **Why NTB** | Charcoal section; 4 tilted cards float/settle on scroll (like the awards cards). One short line under it. | Card titles only: "A creative perspective." etc.; line: "Because good ideas deserve better execution." |
+| 5 | **AI, shown not told** | Two big highlight cards side by side (like "Branding In Motion / Flowforms"): left an animated workflow (form → AI qualify → CRM → notify); right the live order dashboard, labelled **DEMO DATA**. | Tag + title per card. Implementation steps hidden behind "How we build it" toggle. |
+| 6 | **How we work** | One row of 5 compact numbered steps (Discover → Optimise); hover/tap reveals the sentence. Engagement types as small pill chips beneath. | Step names only by default. |
+| 7 | **The founders** | "THE TEAM" big uppercase, two large pill chips with photo + name + role, coloured like "THE FAMILY". Click → founder sheet (photo, 2-line bio, email, phone). Story ("Two 23-year-olds…") as 2 lines above. | "Two 23-year-olds making ideas happen." |
+| 8 | **Closing + footer** | Charcoal footer: "Have something in mind?" + Let's Talk; huge "NOT TO BRAG®" wordmark across full width between thin rules; corners: emails (left), Instagram/LinkedIn (right), "Manage cookies", ©. FAQ as a compact accordion just above the footer. | — |
+| 9 | **Floating card stack** (persistent, bottom-right, closable) | Like vs-goods' "Now or never" card: "Now taking on projects · Book a call" with both founders' avatars and a split button → Contact drawer. Sits under the cookie card on first visit. | 1 line. |
+
+**Work/portfolio:** no fake work. Until real projects exist, there is no Work chapter; the
+capability cards carry the visuals. When projects arrive they become a horizontal rail in chapter 2.5.
+
+### Contact drawer
+
+Slides in from the right over a dimmed page. Step 1: four big choice cards ("What are you looking
+for?"). Step 2: short form (name, brand, email, phone optional, message) with a line showing who
+will read it ("Goes straight to Riddhi"). Success state in-drawer. Same `/api/contact` routing.
+
+### Cookie consent (as vs-goods)
+
+Pink card (`#EBA6D9`), headline "We use" + black tilted chip "Cookies", two split buttons
+"Accept all" / "Reject non-essential", small line with "preferences" link. Shown bottom-right on
+first visit, stacked above the status card. Choice stored in localStorage; "Manage cookies" in the
+footer reopens it. **Only meaningful if we load something non-essential**: plan is Vercel Web
+Analytics, loaded only after "Accept all". If the founders don't want analytics, drop the banner.
+
+### Visual system
+
+- Canvas `#DAD1C3` (warm sand, same family as vs-goods), paper `#F7F5F2`, ink `#222423`,
+  brand olive `#6C6847` (hero, accents), cream `#F1E6D8`.
+- Accents (tags, chips, cards), used sparingly: pink `#EBA6D9`, periwinkle `#6B7CF0`,
+  green `#86D98A`, terracotta `#EE7A55`.
+- Type: Figtree Variable (Roobert stand-in), weight 500 for headings, 400 body. Scale: 13 (labels,
+  uppercase tags), 15–16 (body), 20, 30, 44, 56; display only for list + footer.
+- Radius 12 (buttons, small cards), 20 (big cards). Glass: `rgba(255,255,255,.55)` + 18px blur.
+- Buttons: split button (label cell + arrow cell `⏎`), dark / light / glass variants.
+- Motion: slow drift in hero, cards settle with spring easing on scroll, hover lift ≤ 4px,
+  everything off under `prefers-reduced-motion`.
+- Mobile first-class: rails swipe, drawers become bottom sheets, cursor preview disabled.
+
+### Reference notes
+
+- Look and interaction reference: https://vs-goods.store/ (studied 2026-11-21 at 1440px).
+- AI visuals reference: https://dhruv-studio.vercel.app/ (workflow nodes, order dashboard).
+- Logo assets: `client/public/brand/` (NTB mark in cream/ink/olive). Gmail/Workspace logo exports
+  in `out/`.
 
 ## Stack and layout
 
@@ -89,11 +157,9 @@ Commands (from repo root):
   Sender is dhruv@nottobrag.org via Gmail SMTP with an App Password. If sending breaks, run
   `npm run verify-smtp -w server` (reads server/.env) to test the login locally.
 
-- Built: all six pages, FAQ, footer, contact API with routing, SEO meta, favicon/OG image.
-- Our Work has **no projects yet**: it shows the four categories and an "in progress" note.
-  Add real projects to `work.projects` in `client/src/content/site.js`.
-- Pending from founders: company LinkedIn URL, real portfolio projects, SMTP app password,
-  confirmation of founder role mapping.
+- v2 single-page redesign built and checked locally (desktop 1280/1440 + mobile 375).
+- No portfolio projects yet. Pending from founders: company LinkedIn URL, real projects,
+  confirmation of founder role mapping, analytics yes/no (decides the cookie banner).
 
 ### Contact form routing (`server/lib/routing.js`)
 

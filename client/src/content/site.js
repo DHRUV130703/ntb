@@ -319,7 +319,7 @@ export const work = {
   body: 'This is where we showcase our creative thinking, strategic approach and technical capabilities.',
   categories: [
     { no: '01', title: 'Brand & Creative', body: 'Brand identities, visual concepts, social media campaigns and creative direction.', accent: 'terracotta' },
-    { no: '02', title: 'Content & Campaigns', body: 'Content strategies, digital campaigns, brand storytelling and marketing execution.', accent: 'lime' },
+    { no: '02', title: 'Content & Campaigns', body: 'Content strategies, digital campaigns, brand storytelling and marketing execution.', accent: 'green' },
     { no: '03', title: 'Creators & Collaborations', body: 'Creator campaigns, influencer partnerships and UGC concepts.', accent: 'pink' },
     { no: '04', title: 'AI & Automation', body: 'AI agent demonstrations, automated workflows, customer experience solutions and business dashboards.', accent: 'periwinkle' },
   ],
@@ -394,7 +394,7 @@ export const contact = {
     { title: 'Creative & Marketing Enquiries', body: 'For branding, social media, content, campaigns and digital marketing.', interest: 'Creative & Marketing', accent: 'terracotta' },
     { title: 'Creator & Brand Collaborations', body: 'For influencer partnerships, creator campaigns and UGC opportunities.', interest: 'Creator Collaborations', accent: 'pink' },
     { title: 'AI & Technology Enquiries', body: 'For AI agents, customer experience, revenue automation and business intelligence.', interest: 'AI & Automation', accent: 'periwinkle' },
-    { title: 'General Business Enquiries', body: 'For partnerships, conversations and everything else.', interest: 'Strategic Partnerships', accent: 'lime' },
+    { title: 'General Business Enquiries', body: 'For partnerships, conversations and everything else.', interest: 'Strategic Partnerships', accent: 'green' },
   ],
   // Must match server/lib/routing.js
   interests: ['Creative & Marketing', 'Creator Collaborations', 'AI & Automation', 'Business Intelligence', 'Strategic Partnerships', 'Something Else'],
@@ -438,4 +438,68 @@ export const seo = {
   '/about': { title: 'About Us | NOT TO BRAG', description: 'Two 23-year-olds making ideas happen. Meet the founders of NOT TO BRAG.' },
   '/approach': { title: 'Our Approach | NOT TO BRAG', description: 'Discover, strategise, create & build, implement, optimise. How NOT TO BRAG works.' },
   '/contact': { title: 'Contact | NOT TO BRAG', description: 'Have an idea, a business challenge or a collaboration in mind? Talk to NOT TO BRAG.' },
+};
+
+// ---------------------------------------------------------------------------
+// v2 single-page narrative (see CLAUDE.md "Redesign v2"). Short lines only;
+// full lists stay in the objects above and are shown inside drawers.
+// ---------------------------------------------------------------------------
+
+export const chapters = [
+  { id: 'capabilities', label: 'What we do' },
+  { id: 'start', label: 'Where to start' },
+  { id: 'why', label: 'Why NTB' },
+  { id: 'ai', label: 'AI, shown' },
+  { id: 'process', label: 'How we work' },
+  { id: 'team', label: 'The founders' },
+];
+
+export const story = {
+  hero: {
+    eyebrow: 'Independent creative & technology studio · Mumbai',
+    title: ['Creative thinking. Intelligent technology.', 'Meaningful growth.'],
+    cta: 'Let’s Talk',
+  },
+  capabilities: {
+    eyebrow: 'What we do',
+    title: 'Three capabilities. One shared vision.',
+    tags: { creative: 'Brands', creators: 'People', ai: 'Systems' },
+  },
+  start: {
+    eyebrow: 'Where should we start?',
+    items: [
+      { label: 'Branding', interest: 'Creative & Marketing', line: 'Strategy, identity, creative direction', accent: 'terracotta', visual: 'brand' },
+      { label: 'Content', interest: 'Creative & Marketing', line: 'Social, reels, photography, campaigns', accent: 'olive', visual: 'reel' },
+      { label: 'Creators', interest: 'Creator Collaborations', line: 'Influencers, UGC, brand partnerships', accent: 'pink', visual: 'creator' },
+      { label: 'AI Agents', interest: 'AI & Automation', line: 'Shopping, support and voice assistants', accent: 'periwinkle', visual: 'chat' },
+      { label: 'Dashboards', interest: 'Business Intelligence', line: 'Reporting, data, performance visibility', accent: 'green', visual: 'dash' },
+    ],
+  },
+  why: {
+    eyebrow: 'Why NOT TO BRAG?',
+    title: 'Because good ideas deserve better execution.',
+  },
+  ai: {
+    eyebrow: 'AI & business intelligence',
+    title: 'Technology should solve problems, not create more of them.',
+    flowTag: 'Revenue automation',
+    flowTitle: 'Every enquiry, qualified and followed up',
+    dashTag: 'Business intelligence',
+    dashTitle: 'Know where every order is. Right now.',
+    howLabel: 'How we build it',
+  },
+  process: {
+    eyebrow: 'How we work',
+    title: 'Good work starts with good conversations.',
+  },
+  team: {
+    eyebrow: 'The people behind the brand',
+    title: 'Two 23-year-olds making ideas happen.',
+    lead: 'A little creativity. A little technology. A lot of ambition.',
+  },
+  closing: {
+    title: 'Have something in mind?',
+    body: 'A brand that needs a fresh perspective? A campaign waiting to happen? A business ready to work smarter?',
+  },
+  status: { eyebrow: 'Now booking', line: 'Talk to the founders directly.', cta: 'Book a call' },
 };
