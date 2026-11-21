@@ -79,11 +79,17 @@ Commands (from repo root):
 
 ### Status (2026-11-21)
 
+- Repo: https://github.com/DHRUV130703/ntb (branch `main`). Pushes to `main` auto-deploy.
+- Vercel: project `nottobrag` in team `dhruvs-projects-3e416bab`, live at https://nottobrag.vercel.app.
+  Domains `nottobrag.app` (primary) and `www.nottobrag.app` (308 → apex) are added in Vercel.
+  Registrar is **Namecheap** (nameservers `dns1/dns2.registrar-servers.com`); DNS must be changed
+  there (see docs/deploy.md). SMTP env vars not yet set in Vercel.
+
 - Built: all six pages, FAQ, footer, contact API with routing, SEO meta, favicon/OG image.
 - Our Work has **no projects yet**: it shows the four categories and an "in progress" note.
   Add real projects to `work.projects` in `client/src/content/site.js`.
 - Pending from founders: company LinkedIn URL, real portfolio projects, SMTP app password,
-  confirmation of founder role mapping, Vercel deploy + DNS change.
+  confirmation of founder role mapping, Namecheap DNS change.
 
 ### Contact form routing (`server/lib/routing.js`)
 

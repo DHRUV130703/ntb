@@ -30,6 +30,9 @@ command and output directory come from `vercel.json`).
 
 ## 3. Attach the domain nottobrag.app
 
+Already done in Vercel (2026-11-21): `nottobrag.app` is primary and `www.nottobrag.app` 308-redirects to it.
+The registrar is **Namecheap**. In Namecheap: Domain List → nottobrag.app → Manage → **Advanced DNS**.
+
 1. Vercel → Project → Settings → Domains → add `nottobrag.app` and `www.nottobrag.app`.
    Choose `nottobrag.app` as primary and let `www` redirect to it (or the reverse; pick one).
 2. At the registrar (the panel with "Source URL / Destination URL"):
