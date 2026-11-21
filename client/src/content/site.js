@@ -458,6 +458,14 @@ export const story = {
   hero: {
     eyebrow: 'Independent creative & technology studio · Mumbai',
     title: ['Creative thinking. Intelligent technology.', 'Meaningful growth.'],
+    lead: ['Not to brag,', 'but we'],
+    // Rotating chip in the hero. `service` opens that capability's drawer; `visual` is the matching card.
+    phrases: [
+      { text: 'build brands', accent: 'terracotta', service: 'creative', visual: 'brand', caption: 'Brand strategy, identity & content' },
+      { text: 'find creators', accent: 'pink', service: 'creators', visual: 'creator', caption: 'Influencer & UGC collaborations' },
+      { text: 'ship AI agents', accent: 'periwinkle', service: 'ai', visual: 'chat', caption: 'Shopping, support & voice assistants' },
+      { text: 'make dashboards', accent: 'green', service: 'ai', visual: 'dash', caption: 'Reporting & business intelligence' },
+    ],
     cta: 'Let’s Talk',
   },
   capabilities: {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { capabilities, story, home, approach, whatWeDo, founders, faqs } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
 import { Button, Reveal, PlusIcon } from '../components/ui.jsx';
-import { Visual, BrandBoard, Reel, CreatorChip, ChatAgent, MiniDash, FlowNode } from '../components/Visuals.jsx';
+import { Visual } from '../components/Visuals.jsx';
 import { OrderDashboardDemo, FlowDemo } from '../components/Demos.jsx';
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -10,52 +10,84 @@ const CAP_VISUAL = { creative: 'brand', creators: 'creator', ai: 'chat' };
 
 /* 1 — Hero ---------------------------------------------------------------- */
 
-const HERO_TILES = [
-  { C: BrandBoard, x: '44%', y: '9%', r: -7, d: 0, w: 300 },
-  { C: Reel, x: '74%', y: '6%', r: 6, d: 1.2, w: 170 },
-  { C: ChatAgent, x: '60%', y: '38%', r: -3, d: 0.6, w: 270 },
-  { C: CreatorChip, x: '30%', y: '40%', r: 5, d: 1.8, w: 240 },
-  { C: MiniDash, x: '86%', y: '42%', r: 8, d: 0.9, w: 200 },
-  { C: FlowNode, x: '14%', y: '14%', r: -10, d: 2.4, w: 190 },
-];
+const PHRASE_MS = 2600;
 
+/** "Not to brag, but we [chip]" — the chip flips through what we do; a matching card follows. */
 function Hero() {
-  const { openContact } = useUi();
-  const stage = useRef(null);
+  const { openContact, openService } = useUi();
+  const phrases = story.hero.phrases;
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [still] = useState(reduced);
 
-  // Gentle parallax with the pointer.
   useEffect(() => {
-    if (reduced()) return;
-    const el = stage.current;
-    const onMove = (e) => {
-      const x = e.clientX / window.innerWidth - 0.5;
-      const y = e.clientY / window.innerHeight - 0.5;
-      el.style.setProperty('--px', x.toFixed(3));
-      el.style.setProperty('--py', y.toFixed(3));
-    };
-    window.addEventListener('pointermove', onMove);
-    return () => window.removeEventListener('pointermove', onMove);
-  }, []);
+    if (still || paused) return;
+    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), PHRASE_MS);
+    return () => clearTimeout(t);
+  }, [i, paused, still, phrases.length]);
 
+  const p = phrases[i];
   return (
     <section className="hero" aria-labelledby="hero-title">
-      <div className="hero__stage" ref={stage} aria-hidden="true">
-        {HERO_TILES.map(({ C, x, y, r, d, w }, i) => (
-          <div key={i} className="hero__tile" style={{ left: x, top: y, '--r': `${r}deg`, '--d': `${d}s`, '--w': `${w}px`, '--depth': (i % 3) + 1 }}>
-            <C />
+      <div className="hero__inner">
+        <div className="hero__copy">
+          <p className="hero__eyebrow">{story.hero.eyebrow}</p>
+          <h1 id="hero-title" className="hero__title">
+            <span className="sr-only">
+              {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.
+            </span>
+            <span aria-hidden="true">
+              {story.hero.lead[0]}
+              <br />
+              {story.hero.lead[1]}{' '}
+              <span className="hero__chipwrap">
+                <span key={i} className="hero__chip" data-accent={p.accent} style={{ '--tilt': i % 2 ? '2.5deg' : '-2.5deg' }}>
+                  {p.text}
+                </span>
+              </span>
+            </span>
+          </h1>
+
+          <div className="hero__segs" role="tablist" aria-label="What we do" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
+            {phrases.map((x, n) => (
+              <button
+                key={x.text}
+                role="tab"
+                aria-selected={n === i}
+                className={`hero__seg ${n === i ? 'is-active' : ''} ${n < i ? 'is-done' : ''} ${paused || still ? 'is-paused' : ''}`}
+                style={{ '--ms': `${PHRASE_MS}ms` }}
+                onClick={() => setI(n)}
+              >
+                <i />
+                <span>{x.text}</span>
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="hero__copy">
-        <p className="hero__eyebrow">{story.hero.eyebrow}</p>
-        <h1 id="hero-title" className="hero__title">
-          {story.hero.title[0]}
-          <br />
-          {story.hero.title[1]}
-        </h1>
-        <Button variant="glass" onClick={() => openContact()}>
-          {story.hero.cta}
-        </Button>
+
+          <div className="hero__foot">
+            <Button variant="dark" onClick={() => openContact()}>
+              {story.hero.cta}
+            </Button>
+            <p className="hero__tagline">
+              {story.hero.title[0]} {story.hero.title[1]}
+            </p>
+          </div>
+        </div>
+
+        <button key={i} className="hero__card" data-accent={p.accent} onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)} onClick={() => openService(p.service)} aria-label={`${p.text}: see services`}>
+          <span className="hero__card-media">
+            <Visual name={p.visual} />
+          </span>
+          <span className="hero__card-info">
+            <span>
+              <b>{p.text.replace(/^\w/, (c) => c.toUpperCase())}</b>
+              <small>{p.caption}</small>
+            </span>
+            <span className="hero__card-go" aria-hidden="true">
+              <PlusIcon />
+            </span>
+          </span>
+        </button>
       </div>
     </section>
   );
