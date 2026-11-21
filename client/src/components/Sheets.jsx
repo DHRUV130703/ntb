@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { capabilities, contact, founders, whatWeDo } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
-import { Button } from './ui.jsx';
+import { Button, PlusIcon } from './ui.jsx';
+import { Visual } from './Visuals.jsx';
 
 /* Shared drawer shell: right-side panel on desktop, bottom sheet on mobile. */
-function Drawer({ open, onClose, label, children, wide }) {
+function Drawer({ open, onClose, label, children, wide, resetKey }) {
   const panel = useRef(null);
   const lastFocus = useRef(null);
+
+  // Moving between sheets (e.g. "Next capability") starts the new one at the top.
+  useEffect(() => {
+    if (panel.current) panel.current.scrollTop = 0;
+  }, [resetKey]);
 
   useEffect(() => {
     if (!open) return;
@@ -240,44 +246,93 @@ function ContactBody({ preset }) {
 /* Service sheet ------------------------------------------------------------ */
 
 const DETAIL = { creative: whatWeDo.creative, creators: whatWeDo.creators, ai: whatWeDo.ai };
+const CAP_VISUAL = { creative: 'brand', creators: 'creator', ai: 'chat' };
 
+/** Service groups for a capability: one collapsed row each, so the sheet opens calm. */
+function groupsFor(id, d) {
+  if (id === 'creators')
+    return [
+      { title: 'What we handle', items: d.services },
+      { title: 'How a collaboration runs', items: d.approach, ordered: true },
+    ];
+  if (id === 'ai') return [...d.services, { title: 'How we implement', items: d.approach, ordered: true }];
+  return d.services;
+}
+
+/**
+ * Capability sheet. Visual header (no giant numbers), one-line pitch, then a short accordion:
+ * each service group is a single row until opened. The enquiry button is docked at the bottom
+ * so it is always one tap away, and "Next" moves between capabilities without closing.
+ */
 function ServiceBody({ id }) {
-  const { openContact } = useUi();
-  const cap = capabilities.find((c) => c.id === id);
+  const { openContact, openService } = useUi();
+  const idx = capabilities.findIndex((c) => c.id === id);
+  const cap = capabilities[idx];
   const d = DETAIL[id];
+  const [open, setOpen] = useState(-1);
   if (!cap) return null;
-  const groups = id === 'creative' ? d.services : id === 'ai' ? d.services : [{ title: 'Services', items: d.services }];
+  const groups = groupsFor(id, d);
+  const next = capabilities[(idx + 1) % capabilities.length];
+
   return (
-    <div className="sheet" data-accent={cap.accent}>
-      <div className="sheet__hero">
-        <span className="sheet__no">{cap.no}</span>
+    <div className="sv" data-accent={cap.accent}>
+      <div className="sv__media">
+        <span className="sv__no">
+          {cap.no} / 0{capabilities.length}
+        </span>
+        <Visual name={CAP_VISUAL[id]} />
+      </div>
+
+      <div className="sv__body">
         <span className="tag">{cap.title}</span>
-      </div>
-      <h2 className="h-lg">{d.headline}</h2>
-      <p className="sheet__lead">{d.lead}</p>
-      <div className="svc-groups">
-        {groups.map((g) => (
-          <div key={g.title} className="svc-group">
-            <h3>{g.title}</h3>
-            <ul>
-              {g.items.map((it) => (
-                <li key={it}>{it}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-      {id === 'creators' && (
-        <div className="sheet__note">
-          <b>{d.forCreators.title}</b> {d.forCreators.body}{' '}
-          <button className="link" onClick={() => openContact({ interest: 'Creator Collaborations', creator: true })}>
-            {d.forCreators.cta} →
-          </button>
+        <h2 className="sv__title">{d.headline}</h2>
+        <p className="sv__lead">{d.lead}</p>
+
+        <div className="sv__list">
+          {groups.map((g, n) => {
+            const isOpen = open === n;
+            const List = g.ordered ? 'ol' : 'ul';
+            return (
+              <div key={g.title} className={`sv__row ${isOpen ? 'is-open' : ''}`}>
+                <button aria-expanded={isOpen} aria-controls={`sv-${id}-${n}`} onClick={() => setOpen(isOpen ? -1 : n)}>
+                  <span>{g.title}</span>
+                  <span className="sv__count">{g.items.length}</span>
+                  <span className="sv__pm" aria-hidden="true">
+                    <PlusIcon />
+                  </span>
+                </button>
+                <div className="sv__panel" id={`sv-${id}-${n}`}>
+                  <List className={g.ordered ? 'is-ordered' : ''}>
+                    {g.items.map((it) => (
+                      <li key={it}>{it}</li>
+                    ))}
+                  </List>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
-      <div className="sheet__submit">
-        <span />
-        <Button variant="dark" data-autofocus="" onClick={() => openContact({ interest: cap.interest })}>
+
+        {id === 'creators' && (
+          <button className="sv__aside" onClick={() => openContact({ interest: 'Creator Collaborations', creator: true })}>
+            <span>
+              <b>Are you a creator?</b> Join our creator network
+            </span>
+            <span aria-hidden="true">→</span>
+          </button>
+        )}
+
+        <button className="sv__next" onClick={() => openService(next.id)}>
+          <span className="sv__next-label">Next</span>
+          <span className="sv__next-title">
+            {next.no} {next.title}
+          </span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <div className="sv__dock">
+        <Button variant="dark" className="btn--block" data-autofocus="" onClick={() => openContact({ interest: cap.interest })}>
           {d.cta}
         </Button>
       </div>
@@ -326,7 +381,7 @@ export default function Sheets() {
       <Drawer open={type === 'contact'} onClose={close} label="Contact NOT TO BRAG" wide>
         {type === 'contact' && <ContactBody key={key} preset={sheet} />}
       </Drawer>
-      <Drawer open={type === 'service'} onClose={close} label="Service details">
+      <Drawer open={type === 'service'} onClose={close} label="Service details" resetKey={key}>
         {type === 'service' && <ServiceBody key={key} id={sheet.id} />}
       </Drawer>
       <Drawer open={type === 'founder'} onClose={close} label="Founder">
