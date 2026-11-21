@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env index.js",
     "start": "node --env-file-if-exists=.env index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "verify-smtp": "node --env-file-if-exists=.env verify-smtp.js"
   },
   "dependencies": {
     "express": "^4.21.2",
