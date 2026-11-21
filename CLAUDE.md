@@ -157,7 +157,8 @@ Commands (from repo root):
   Sender is dhruv@nottobrag.org via Gmail SMTP with an App Password. If sending breaks, run
   `npm run verify-smtp -w server` (reads server/.env) to test the login locally.
 
-- v2 single-page redesign built and checked locally (desktop 1280/1440 + mobile 375).
+- v2 single-page redesign + "Not to brag, but we …" hero are **live on https://nottobrag.app**
+  (pushed 2026-11-21, commit ca8d42a). Checked desktop 1024–1440, tablet 820, mobile 375.
 - No portfolio projects yet. Pending from founders: company LinkedIn URL, real projects,
   confirmation of founder role mapping, analytics yes/no (decides the cookie banner).
 
