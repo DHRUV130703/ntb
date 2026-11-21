@@ -1,0 +1,21 @@
+{
+  "name": "nottobrag",
+  "private": true,
+  "description": "NOT TO BRAG website: React (Vite) frontend + Node/Express backend",
+  "type": "module",
+  "workspaces": ["client", "server"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "concurrently -n api,web -c yellow,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "preview": "npm run build && NODE_ENV=production npm run start -w server"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "nodemailer": "^6.9.16"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
