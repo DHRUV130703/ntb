@@ -2157,114 +2157,78 @@ p {
   font-size: 15.5px;
   color: var(--muted);
 }
-.sv__list {
-  display: grid;
-  gap: 4px;
-  margin-top: 10px;
-}
-.sv__row {
-  border-radius: var(--r);
-  background: var(--white);
-  transition: box-shadow 0.3s;
-}
-.sv__row.is-open {
-  box-shadow: inset 0 0 0 1.5px var(--ink);
-}
-.sv__row > button {
+.sv__tabs {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 52px;
-  padding: 0 10px 0 16px;
-  font-size: 15px;
+  gap: 6px;
+  margin: 14px calc(-1 * clamp(20px, 3vw, 28px)) 0;
+  padding: 0 56px 2px clamp(20px, 3vw, 28px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* fade the edge so it's clear more tabs sit off-screen */
+  mask-image: linear-gradient(90deg, transparent 0, #000 clamp(20px, 3vw, 28px), #000 calc(100% - 48px), transparent);
+}
+.sv__tabs::-webkit-scrollbar {
+  display: none;
+}
+.sv__tab {
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 13.5px;
   font-weight: 500;
-}
-.sv__count {
-  margin-left: auto;
-  min-width: 24px;
-  height: 22px;
-  padding: 0 7px;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
   color: var(--muted);
-  background: var(--paper);
-}
-.sv__pm {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: var(--canvas);
+  white-space: nowrap;
   transition: background 0.25s, color 0.25s;
 }
-.sv__pm svg,
-.faq__pm svg {
-  transition: rotate 0.35s var(--ease);
+.sv__tab:hover {
+  color: var(--ink);
 }
-.sv__row.is-open .sv__pm {
+.sv__tab.is-active {
   background: var(--ink);
   color: var(--paper);
 }
-.sv__row.is-open .sv__pm svg,
-.faq details[open] .faq__pm svg {
-  rotate: 45deg;
+.sv__tab:focus-visible {
+  outline-offset: 2px;
 }
-.sv__panel {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.4s var(--ease);
-}
-.sv__row.is-open .sv__panel {
-  grid-template-rows: 1fr;
-}
-.sv__panel > ul,
-.sv__panel > ol {
-  overflow: hidden;
-  margin: 0;
-  padding: 0 16px;
+.sv__items {
   list-style: none;
-  columns: 2;
-  column-gap: 24px;
-  font-size: 14px;
-  color: var(--ink-2);
-  counter-reset: sv;
+  margin: 4px 0 0;
+  padding: 0;
 }
-.sv__row.is-open .sv__panel > * {
-  padding-bottom: 14px;
-}
-.sv__panel li {
+.sv__items li {
   display: flex;
-  gap: 10px;
-  padding: 5px 0;
-  break-inside: avoid;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  animation: itemIn 0.45s var(--ease) both;
+  animation-delay: calc(var(--n) * 40ms);
 }
-.sv__panel li::before {
-  content: '';
+.sv__item-no {
   flex: none;
-  width: 6px;
-  height: 6px;
-  margin-top: 0.55em;
-  border-radius: 2px;
-  background: var(--accent);
-}
-.sv__panel ol.is-ordered {
-  columns: 1;
-}
-.sv__panel ol.is-ordered li {
-  counter-increment: sv;
-}
-.sv__panel ol.is-ordered li::before {
-  content: counter(sv, decimal-leading-zero);
-  width: auto;
-  height: auto;
-  margin-top: 0.1em;
-  background: none;
+  width: 22px;
   font-size: 12px;
+  font-weight: 500;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.sv__items li:first-child .sv__item-no,
+.sv__items li:hover .sv__item-no {
+  color: var(--accent-ink);
+}
+.sv__items li:hover {
+  padding-left: 6px;
+  transition: padding 0.3s var(--ease);
+}
+@keyframes itemIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 .sv__aside {
   display: flex;
@@ -2312,11 +2276,16 @@ p {
   width: 100%;
 }
 @media (max-width: 520px) {
-  .sv__panel > ul {
-    columns: 1;
-  }
   .sv__media {
     aspect-ratio: 16 / 10;
     padding: 44px 14% 20px;
   }
+}
+
+/* FAQ +/× icon: rotate the glyph, not its square */
+.faq__pm svg {
+  transition: rotate 0.35s var(--ease);
+}
+.faq details[open] .faq__pm svg {
+  rotate: 45deg;
 }

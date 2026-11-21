@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { capabilities, contact, founders, whatWeDo } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
-import { Button, PlusIcon } from './ui.jsx';
+import { Button } from './ui.jsx';
 import { Visual } from './Visuals.jsx';
 
 /* Shared drawer shell: right-side panel on desktop, bottom sheet on mobile. */
@@ -269,7 +269,7 @@ function ServiceBody({ id }) {
   const idx = capabilities.findIndex((c) => c.id === id);
   const cap = capabilities[idx];
   const d = DETAIL[id];
-  const [open, setOpen] = useState(-1);
+  const [tab, setTab] = useState(0);
   if (!cap) return null;
   const groups = groupsFor(id, d);
   const next = capabilities[(idx + 1) % capabilities.length];
@@ -288,30 +288,32 @@ function ServiceBody({ id }) {
         <h2 className="sv__title">{d.headline}</h2>
         <p className="sv__lead">{d.lead}</p>
 
-        <div className="sv__list">
-          {groups.map((g, n) => {
-            const isOpen = open === n;
-            const List = g.ordered ? 'ol' : 'ul';
-            return (
-              <div key={g.title} className={`sv__row ${isOpen ? 'is-open' : ''}`}>
-                <button aria-expanded={isOpen} aria-controls={`sv-${id}-${n}`} onClick={() => setOpen(isOpen ? -1 : n)}>
-                  <span>{g.title}</span>
-                  <span className="sv__count">{g.items.length}</span>
-                  <span className="sv__pm" aria-hidden="true">
-                    <PlusIcon />
-                  </span>
-                </button>
-                <div className="sv__panel" id={`sv-${id}-${n}`}>
-                  <List className={g.ordered ? 'is-ordered' : ''}>
-                    {g.items.map((it) => (
-                      <li key={it}>{it}</li>
-                    ))}
-                  </List>
-                </div>
-              </div>
-            );
-          })}
+        <div className="sv__tabs" role="tablist" aria-label={`${cap.title} services`}>
+          {groups.map((g, n) => (
+            <button
+              key={g.title}
+              role="tab"
+              id={`svt-${id}-${n}`}
+              aria-selected={tab === n}
+              aria-controls={`svp-${id}`}
+              className={`sv__tab ${tab === n ? 'is-active' : ''}`}
+              onClick={(e) => {
+                setTab(n);
+                e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+              }}
+            >
+              {g.title}
+            </button>
+          ))}
         </div>
+        <ol key={tab} className="sv__items" id={`svp-${id}`} role="tabpanel" aria-labelledby={`svt-${id}-${tab}`}>
+          {groups[tab].items.map((it, n) => (
+            <li key={it} style={{ '--n': n }}>
+              <span className="sv__item-no">{String(n + 1).padStart(2, '0')}</span>
+              {it}
+            </li>
+          ))}
+        </ol>
 
         {id === 'creators' && (
           <button className="sv__aside" onClick={() => openContact({ interest: 'Creator Collaborations', creator: true })}>
