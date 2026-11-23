@@ -508,6 +508,16 @@ export const story = {
     eyebrow: 'The people behind the brand',
     title: 'Two 23-year-olds making ideas happen.',
     lead: 'A little creativity. A little technology. A lot of ambition.',
+    note: 'Every message reaches one of us directly.',
+    // Founders chat thread (v2.5). `from` is a founder id; times echo the founders' own chat.
+    chat: [
+      { from: 'riddhi', text: 'Hi, I’m Riddhi 👋', time: '12:48' },
+      { from: 'riddhi', text: 'I keep creative strategy & partnerships: brands, stories and the people behind great collaborations.', time: '12:48' },
+      { from: 'dhruv', text: 'And I’m Dhruv. AI solutions & business automation.', time: '12:49' },
+      { from: 'dhruv', text: 'Agents, automations and the systems that help businesses run smarter.', time: '12:49' },
+      { from: 'riddhi', text: 'Two 23-year-olds. One studio. Tell us what you’re building.', time: '12:50' },
+    ],
+    replyPlaceholder: 'Say hi to both of us…',
   },
   closing: {
     title: 'Have something in mind?',
