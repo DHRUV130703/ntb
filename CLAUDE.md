@@ -164,6 +164,11 @@ drawer under "Questions first?".
   bullets), auto-cycles while on screen, hover takes over, click opens the service drawer, plus
   "Not sure where to start? Let's talk".
 
+**Mobile pass (2026-11-23):** audited 375 / 414 / 768. No horizontal overflow anywhere; hero
+phrase tabs and footer links have ≥44px tap targets; slim two-button cookie card on phones (no
+paragraph); stickers anchored with `translate: calc(var(--x) * -1%)` so they never overflow;
+statement and closing get less vertical padding; AI card shows only the dashboard on phones.
+
 **v4 hero (superseded; the list now lives in Services):**
 jeppesen's preloader (NTB mark slices lock together, once per session) + paper grain, then
 vs-goods' "MOCKUP LIBRARY" list as the hero: centred eyebrow, "**Not to brag,** but we" (Clash
@@ -241,8 +246,7 @@ Commands (from repo root):
   Sender is dhruv@nottobrag.org via Gmail SMTP with an App Password. If sending breaks, run
   `npm run verify-smtp -w server` (reads server/.env) to test the login locally.
 
-- Live: v2 (pushed 2026-11-21). Built locally 2026-11-23, not yet pushed: founder titles, founders
-  sentence (v2.6), hero moving wall (v2.7, now replaced) and **v3 jeppesen redesign**.
+- Live on https://nottobrag.app: v3 + v5 hero + mobile pass (pushed 2026-11-23).
 - No portfolio projects yet. Pending from founders: company LinkedIn URL, real projects,
   analytics yes/no (decides the cookie banner).
 

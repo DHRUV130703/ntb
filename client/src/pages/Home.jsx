@@ -119,7 +119,7 @@ function Hero() {
               key={st.t}
               className={`sticker ${st.k === i ? 'is-on' : ''}`}
               data-accent={PHRASE_ACCENT[st.k]}
-              style={{ left: `${st.x}%`, top: `${st.y}%`, '--r': `${st.r}deg`, '--d': `${(n % 5) * 0.7}s` }}
+              style={{ left: `${st.x}%`, top: `${st.y}%`, '--x': st.x, '--r': `${st.r}deg`, '--d': `${(n % 5) * 0.7}s` }}
             >
               <i />
               {st.t}
