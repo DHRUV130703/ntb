@@ -22,10 +22,12 @@ in the same turn.
 
 | Founder | Role | Email | Phone |
 |---|---|---|---|
-| Riddhi | Founder, Creative & Marketing | riddhi@nottobrag.org | +91 93725 15440 |
-| Dhruv | Founder, Technology & AI | dhruv@nottobrag.org | +91 89286 51938 |
+| Riddhi | Founder, **Creative Strategy & Partnerships** | riddhi@nottobrag.org | +91 93725 15440 |
+| Dhruv | Founder, **AI Solutions & Business Automation** | dhruv@nottobrag.org | +91 89286 51938 |
 
-Role mapping is inferred (Dhruv's own studio site is the AI reference); confirm with the founders.
+Titles confirmed by the founders on 2026-11-23 (they replace "Creative & Marketing" / "Technology & AI"
+for the people; the capability names stay as they are). Fields: `role`, `title`, `short` in
+`founders` in `content/site.js`.
 Photos: `client/public/images/founders/riddhi.jpg`, `dhruv.jpg` (real photos supplied by founders).
 
 ### Contact details
@@ -85,7 +87,7 @@ detail only when the visitor asks for it.
 | 4 | **Why NTB** | Charcoal section; 4 tilted cards float/settle on scroll (like the awards cards). One short line under it. | Card titles only: "A creative perspective." etc.; line: "Because good ideas deserve better execution." |
 | 5 | **AI, shown not told** | Two big highlight cards side by side (like "Branding In Motion / Flowforms"): left an animated workflow (form → AI qualify → CRM → notify); right the live order dashboard, labelled **DEMO DATA**. | Tag + title per card. Implementation steps hidden behind "How we build it" toggle. |
 | 6 | **How we work** | One row of 5 compact numbered steps (Discover → Optimise); hover/tap reveals the sentence. Engagement types as small pill chips beneath. | Step names only by default. |
-| 7 | **The founders** | "THE TEAM" big uppercase, two large pill chips with photo + name + role, coloured like "THE FAMILY". Click → founder sheet (photo, 2-line bio, email, phone). Story ("Two 23-year-olds…") as 2 lines above. | "Two 23-year-olds making ideas happen." |
+| 7 | **The founders** (v2.4, 2026-11-23, redesigned after the pill chips felt weak) | Header row: eyebrow + "Two 23-year-olds making ideas happen." left, "A little creativity…" right. Then **two portrait cards** side by side (photo fills the card, slight opposite tilts, height capped to the viewport) joined by a round cream **"&" badge**. Each card has a glass panel at the bottom: founder title as a tilted accent chip (Riddhi terracotta *Creative Strategy & Partnerships*, Dhruv periwinkle *AI Solutions & Business Automation*), name, one line (`short`), and actions: "Talk to {name}" split button (opens Contact pre-routed to them) + email + call icon buttons. Phones: swipeable snap rail (84% cards, next one peeks) with dots; no "&". The founder sheet is no longer opened from here. | Headline + lead; one line per founder. |
 | 8 | **Closing + footer** | Charcoal footer: "Have something in mind?" + Let's Talk; huge "NOT TO BRAG®" wordmark across full width between thin rules; corners: emails (left), Instagram/LinkedIn (right), "Manage cookies", ©. FAQ as a compact accordion just above the footer. | — |
 | 9 | **Floating card stack** (persistent, bottom-right, closable) | Like vs-goods' "Now or never" card: "Now taking on projects · Book a call" with both founders' avatars and a split button → Contact drawer. Sits under the cookie card on first visit. | 1 line. |
 
@@ -160,7 +162,7 @@ Commands (from repo root):
 - v2 single-page redesign + "Not to brag, but we …" hero are **live on https://nottobrag.app**
   (pushed 2026-11-21, commit ca8d42a). Checked desktop 1024–1440, tablet 820, mobile 375.
 - No portfolio projects yet. Pending from founders: company LinkedIn URL, real projects,
-  confirmation of founder role mapping, analytics yes/no (decides the cookie banner).
+  analytics yes/no (decides the cookie banner).
 
 ### Contact form routing (`server/lib/routing.js`)
 

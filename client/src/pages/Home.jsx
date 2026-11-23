@@ -300,38 +300,86 @@ function Process() {
   );
 }
 
-/* 7 — Team -------------------------------------------------------------- */
+/* 7 — Founders --------------------------------------------------------- */
 
-function Team() {
-  const { openFounder } = useUi();
+const MailIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <rect x="2.5" y="4.5" width="15" height="11" rx="2.5" stroke="currentColor" strokeWidth="1.5" />
+    <path d="m3.5 6 6.5 5 6.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const PhoneIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path
+      d="M6.2 3.5h-1.7a1.5 1.5 0 0 0-1.5 1.6C3.4 11.3 8.7 16.6 14.9 17a1.5 1.5 0 0 0 1.6-1.5v-1.7a1 1 0 0 0-.8-1l-2.6-.6a1 1 0 0 0-1 .3l-1 1.1a10 10 0 0 1-4.7-4.7l1.1-1a1 1 0 0 0 .3-1l-.6-2.6a1 1 0 0 0-1-.8Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/** Two portrait cards joined by an "&": one creative, one technical, one studio. */
+function Founders() {
+  const { openContact } = useUi();
+  const rail = useRef(null);
+  const [active, setActive] = useState(0);
+
+  // Phones: the cards swipe; keep the dots in sync with the visible card.
+  useEffect(() => {
+    const el = rail.current;
+    if (!el) return;
+    const onScroll = () => setActive(Math.round(el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth)));
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <section id="team" className="chapter team">
+    <section id="team" className="chapter founders">
       <div className="wrap">
-        <Reveal>
-          <p className="label label--center">{story.team.eyebrow}</p>
-          <h2 className="team__title">The Founders</h2>
-          <p className="team__lead">
-            {story.team.title}
-            <br />
-            {story.team.lead}
-          </p>
+        <Reveal className="founders__head">
+          <div>
+            <p className="label">{story.team.eyebrow}</p>
+            <h2 className="h-lg">{story.team.title}</h2>
+          </div>
+          <p className="founders__lead">{story.team.lead}</p>
         </Reveal>
-        <div className="team__pills">
+      </div>
+
+      <div className="founders__stage">
+        <div className="founders__rail" ref={rail}>
           {founders.map((f, i) => (
-            <Reveal key={f.id} delay={i * 120}>
-              <button className="fpill" data-accent={f.accent} onClick={() => openFounder(f.id)}>
-                <img src={f.photo} alt="" />
-                <span>
-                  <b>{f.name}</b>
-                  <small>{f.role.replace('Founder — ', '')}</small>
-                </span>
-                <span className="fpill__more" aria-hidden="true">
-                  <PlusIcon />
-                </span>
-              </button>
+            <Reveal key={f.id} as="article" className="fcard" data-accent={f.accent} delay={i * 120} style={{ '--tilt': i ? '1.2deg' : '-1.2deg' }}>
+              <img className="fcard__photo" src={f.photo} alt={`${f.name}, ${f.title}`} loading="lazy" />
+              <span className="fcard__no">0{i + 1}</span>
+              <div className="fcard__panel">
+                <span className="fcard__chip">{f.title}</span>
+                <h3 className="fcard__name">{f.name}</h3>
+                <p className="fcard__line">{f.short}</p>
+                <div className="fcard__actions">
+                  <Button variant="dark" onClick={() => openContact({ interest: f.id === 'dhruv' ? 'AI & Automation' : 'Creative & Marketing' })}>
+                    Talk to {f.name}
+                  </Button>
+                  <a className="fcard__icon" href={`mailto:${f.email}`} aria-label={`Email ${f.name}`} title={f.email}>
+                    <MailIcon />
+                  </a>
+                  <a className="fcard__icon" href={`tel:${f.tel}`} aria-label={`Call ${f.name}`} title={f.phone}>
+                    <PhoneIcon />
+                  </a>
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>
+        <span className="founders__amp" aria-hidden="true">
+          &amp;
+        </span>
+      </div>
+
+      <div className="founders__dots" aria-hidden="true">
+        {founders.map((f, i) => (
+          <i key={f.id} className={active === i ? 'is-on' : ''} />
+        ))}
       </div>
     </section>
   );
@@ -371,7 +419,7 @@ export default function Home() {
       <Why />
       <AiShowcase />
       <Process />
-      <Team />
+      <Founders />
       <Faq />
     </>
   );

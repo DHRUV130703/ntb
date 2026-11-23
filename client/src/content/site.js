@@ -16,7 +16,9 @@ export const founders = [
   {
     id: 'riddhi',
     name: 'Riddhi',
-    role: 'Founder — Creative & Marketing',
+    role: 'Founder — Creative Strategy & Partnerships',
+    title: 'Creative Strategy & Partnerships',
+    short: 'Brands, storytelling and the people behind great collaborations.',
     photo: '/images/founders/riddhi.jpg',
     email: 'riddhi@nottobrag.org',
     phone: '+91 93725 15440',
@@ -28,7 +30,9 @@ export const founders = [
   {
     id: 'dhruv',
     name: 'Dhruv',
-    role: 'Founder — Technology & AI',
+    role: 'Founder — AI Solutions & Business Automation',
+    title: 'AI Solutions & Business Automation',
+    short: 'AI agents, automation and the systems that help businesses run smarter.',
     photo: '/images/founders/dhruv.jpg',
     email: 'dhruv@nottobrag.org',
     phone: '+91 89286 51938',

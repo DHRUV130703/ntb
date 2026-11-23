@@ -348,11 +348,11 @@ And we're only getting started.
 
 ## THE PEOPLE BEHIND THE BRAND
 
-**FOUNDER — CREATIVE & MARKETING**
+**FOUNDER — CREATIVE & MARKETING** (Riddhi; site title since 2026-11-23: *Creative Strategy & Partnerships*)
 
 Responsible for creative direction, brand strategy, content, marketing, social media, creator partnerships and collaborations.
 
-**FOUNDER — TECHNOLOGY & AI**
+**FOUNDER — TECHNOLOGY & AI** (Dhruv; site title since 2026-11-23: *AI Solutions & Business Automation*)
 
 Responsible for AI solutions, intelligent automation, technical implementation, customer experience systems, data integrations and business intelligence.
 
