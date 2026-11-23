@@ -139,6 +139,19 @@ in `content/site.js`. Clash Grotesk is loaded from Fontshare in `client/index.ht
 tilted why-cards, AI duo, step cards, FAQ section) were removed; FAQ now sits in the Contact
 drawer under "Questions first?".
 
+**v3.1 fixes (2026-11-23, after founder review):**
+- Hero: the big NTB mark on the right "didn't make sense" → removed. The mark now only plays as a
+  ~1.5s **preloader** (slices lock together, panel slides up; once per session via
+  sessionStorage `ntb-intro-seen`, skipped under reduced motion). Hero = editorial headline across
+  the width ("**Not to brag,** but we" on one line, chip below) + a hairline **bottom bar**:
+  lead line | four phrase segments | Let's Talk.
+- Beliefs: grid + title + big line repeated the same sentence → now **one belief per screen**:
+  pinned dark band, eyebrow + "03 / 06" counter, one huge line, six progress bars, small footer
+  line "Because good ideas deserve better execution."
+- Footer: giant personal emails were "completely wrong" → one big contact line "Tell us what
+  you're building →" (opens Contact) + founders listed small with name, title and email; base row
+  has ©, location, Instagram, Manage cookies, Back to top.
+
 Reference studied 2026-11-23: https://jeppesen.dev/ (one-partner branding/web studio). What makes it
 work: a single grainy paper colour (#F2EDE4) + near-black ink (#252525); one display face
 (Clash Grotesk, weight ~580, with a regular-weight continuation line); the brand mark animates as
