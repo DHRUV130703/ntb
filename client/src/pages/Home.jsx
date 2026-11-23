@@ -376,172 +376,117 @@ function Process() {
   );
 }
 
-/* 7 — Founders: a group chat ------------------------------------------- */
+/* 7 — Founders: one sentence, names as chips ------------------------------ */
 
-const SendIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 20 20"
-    fill="none"
-    aria-hidden="true"
-  >
+const MailIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <rect x="2.5" y="4.5" width="15" height="11" rx="2.5" stroke="currentColor" strokeWidth="1.5" />
+    <path d="m3.5 6 6.5 5 6.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const PhoneIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
     <path
-      d="M10 16V4M5 9l5-5 5 5"
+      d="M6.2 3.5h-1.7a1.5 1.5 0 0 0-1.5 1.6C3.4 11.3 8.7 16.6 14.9 17a1.5 1.5 0 0 0 1.6-1.5v-1.7a1 1 0 0 0-.8-1l-2.6-.6a1 1 0 0 0-1 .3l-1 1.1a10 10 0 0 1-4.7-4.7l1.1-1a1 1 0 0 0 .3-1l-.6-2.6a1 1 0 0 0-1-.8Z"
       stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
+      strokeWidth="1.5"
       strokeLinejoin="round"
     />
   </svg>
 );
 
-/** The founders introduce themselves as messages that arrive one by one, ending in a reply bar. */
-function Founders() {
+function FounderChip({ f, open, setOpen, tilt }) {
   const { openContact } = useUi();
-  const thread = story.team.chat;
-  const byId = Object.fromEntries(founders.map((f) => [f.id, f]));
-  const ref = useRef(null);
-  const [shown, setShown] = useState(() => (reduced() ? thread.length : 0));
-  const [started, setStarted] = useState(false);
+  const leave = useRef(null);
+  const hoverable = () => window.matchMedia('(hover: hover)').matches;
+  const isOpen = open === f.id;
+  return (
+    <span
+      className={`fname ${isOpen ? 'is-open' : ''}`}
+      data-accent={f.accent}
+      onPointerEnter={() => {
+        if (!hoverable()) return;
+        clearTimeout(leave.current);
+        setOpen(f.id);
+      }}
+      onPointerLeave={() => {
+        if (!hoverable()) return;
+        leave.current = setTimeout(() => setOpen((o) => (o === f.id ? null : o)), 180);
+      }}
+    >
+      <button
+        className="fname__chip"
+        style={{ '--tilt': tilt }}
+        aria-expanded={isOpen}
+        aria-controls={`fpop-${f.id}`}
+        onClick={() => setOpen((o) => (o === f.id ? null : f.id))}
+      >
+        <img src={f.photo} alt="" />
+        {f.name}
+      </button>
+      <span className="fpop" id={`fpop-${f.id}`} role="group" aria-label={`${f.name}, ${f.title}`}>
+        <span className="fpop__head">
+          <img src={f.photo} alt="" />
+          <span>
+            <b>{f.name}</b>
+            <small>{f.title}</small>
+          </span>
+          <button className="fpop__x" aria-label="Close" onClick={() => setOpen(null)}>
+            ×
+          </button>
+        </span>
+        <span className="fpop__line">{f.short}</span>
+        <span className="fpop__actions">
+          <Button variant="dark" onClick={() => openContact({ interest: f.id === 'dhruv' ? 'AI & Automation' : 'Creative & Marketing' })}>
+            Talk to {f.name}
+          </Button>
+          <a className="fpop__icon" href={`mailto:${f.email}`} aria-label={`Email ${f.name}`} title={f.email}>
+            <MailIcon />
+          </a>
+          <a className="fpop__icon" href={`tel:${f.tel}`} aria-label={`Call ${f.name}`} title={f.phone}>
+            <PhoneIcon />
+          </a>
+        </span>
+      </span>
+    </span>
+  );
+}
 
+function Founders() {
+  const [open, setOpen] = useState(null);
+  const [riddhi, dhruv] = founders;
+  const [s1, s2, s3] = story.team.sentence;
+  const wrap = useRef(null);
+
+  // Close on Escape or a tap outside the chips.
   useEffect(() => {
-    if (shown >= thread.length) return;
-    const io = new IntersectionObserver(
-      ([e]) => e.isIntersecting && setStarted(true),
-      { threshold: 0.35 },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, [shown, thread.length]);
-
-  // Reveal the next bubble after a short "typing" pause, longer for longer messages.
-  useEffect(() => {
-    if (!started || shown >= thread.length) return;
-    const delay =
-      shown === 0 ? 350 : Math.min(1400, 450 + thread[shown].text.length * 9);
-    const t = setTimeout(() => setShown((n) => n + 1), delay);
-    return () => clearTimeout(t);
-  }, [started, shown, thread]);
-
-  const typing =
-    started && shown < thread.length ? byId[thread[shown].from] : null;
-  const talkTo = (id) =>
-    openContact({
-      interest:
-        id === "dhruv"
-          ? "AI & Automation"
-          : id === "riddhi"
-            ? "Creative & Marketing"
-            : undefined,
-    });
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(null);
+    const onDown = (e) => !e.target.closest?.('.fname') && setOpen(null);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onDown);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerdown', onDown);
+    };
+  }, [open]);
 
   return (
-    <section id="team" className="chapter founders">
-      <div className="wrap founders__grid">
-        <Reveal className="founders__intro">
-          <p className="label">{story.team.eyebrow}</p>
-          <h2 className="h-lg">{story.team.title}</h2>
-          <p className="founders__lead">{story.team.lead}</p>
-          <ul className="founders__people">
-            {founders.map((f) => (
-              <li key={f.id} data-accent={f.accent}>
-                <img src={f.photo} alt="" />
-                <span>
-                  <b>{f.name}</b>
-                  <small>{f.title}</small>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-
-        <Reveal className="chat-wrap" delay={120}>
-          <div className="chat" ref={ref}>
-            <header className="chat__head">
-              <span className="chat__faces">
-                {founders.map((f) => (
-                  <img key={f.id} src={f.photo} alt="" />
-                ))}
-              </span>
-              <span className="chat__who">
-                <b>NOT TO BRAG · Founders</b>
-                <small>
-                  {typing
-                    ? `${typing.name} is typing…`
-                    : `${founders.map((f) => f.name).join(", ")}`}
-                </small>
-              </span>
-              <span className="chat__online" aria-label="Online" />
-            </header>
-
-            <ol
-              className="chat__body"
-              aria-live="polite"
-              aria-label="Messages from the founders"
-            >
-              {thread.slice(0, shown).map((m, i) => {
-                const f = byId[m.from];
-                const first = i === 0 || thread[i - 1].from !== m.from;
-                const last =
-                  i === thread.length - 1 || thread[i + 1]?.from !== m.from;
-                return (
-                  <li
-                    key={i}
-                    className={`msg ${first ? "msg--first" : ""} ${last ? "msg--last" : ""}`}
-                    data-accent={f.accent}
-                  >
-                    <span className="msg__avatar">
-                      {last && <img src={f.photo} alt="" />}
-                    </span>
-                    <span className="msg__bubble">
-                      {first && <b className="msg__name">{f.name}</b>}
-                      <span className="msg__text">{m.text}</span>
-                      <time className="msg__time">{m.time}</time>
-                    </span>
-                  </li>
-                );
-              })}
-              {typing && (
-                <li
-                  className="msg msg--first msg--last msg--typing"
-                  data-accent={typing.accent}
-                >
-                  <span className="msg__avatar">
-                    <img src={typing.photo} alt="" />
-                  </span>
-                  <span className="msg__bubble">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                </li>
-              )}
-            </ol>
-
-            <div
-              className={`chat__reply ${shown >= thread.length ? "is-ready" : ""}`}
-            >
-              <div className="chat__quick">
-                {founders.map((f) => (
-                  <button
-                    key={f.id}
-                    data-accent={f.accent}
-                    onClick={() => talkTo(f.id)}
-                  >
-                    Talk to {f.name}
-                  </button>
-                ))}
-              </div>
-              <button className="chat__input" onClick={() => talkTo()}>
-                <span>{story.team.replyPlaceholder}</span>
-                <span className="chat__send">
-                  <SendIcon />
-                </span>
-              </button>
-              <p className="chat__note">{story.team.note}</p>
-            </div>
-          </div>
+    <section id="team" className="chapter founders" ref={wrap}>
+      <div className="wrap">
+        <Reveal>
+          <h2 className="label founders__eyebrow">{story.team.eyebrow}</h2>
+          <p className="founders__sentence">
+            {s1} <FounderChip f={riddhi} open={open} setOpen={setOpen} tilt="-2deg" /> {s2}{' '}
+            <FounderChip f={dhruv} open={open} setOpen={setOpen} tilt="2deg" /> {s3}
+          </p>
+          <p className="founders__foot">
+            {story.team.title} {story.team.lead}
+          </p>
+          <p className="founders__hint">
+            <span className="founders__hint--hover">Hover a name to reach them directly.</span>
+            <span className="founders__hint--tap">Tap a name to reach them directly.</span>
+          </p>
         </Reveal>
       </div>
     </section>

@@ -1588,43 +1588,143 @@ p {
   font-size: 14px;
 }
 
-/* Founders: group chat (v2.5) */
-.founders__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
-  gap: clamp(32px, 6vw, 96px);
+/* Founders: one sentence with name chips (v2.6) */
+.founders__eyebrow {
+  color: var(--muted);
+  margin-bottom: 22px;
+  font-weight: 500;
+}
+.founders__sentence {
+  max-width: 1120px;
+  font-size: clamp(30px, 4.4vw, 66px);
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+  text-wrap: pretty;
+}
+.founders__foot {
+  margin-top: clamp(24px, 3vw, 36px);
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 52ch;
+}
+.founders__hint {
+  display: inline-flex;
   align-items: center;
-}
-.founders__intro .label {
-  color: var(--muted);
-  margin-bottom: 14px;
-}
-.founders__intro .h-lg {
-  max-width: 17ch;
-}
-.founders__lead {
-  margin-top: 16px;
-  font-size: 17px;
-  color: var(--muted);
-  max-width: 34ch;
-}
-.founders__people {
-  list-style: none;
-  margin: 32px 0 0;
-  padding: 0;
-  display: grid;
   gap: 8px;
-  max-width: 380px;
+  margin-top: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 500;
 }
-.founders__people li {
+.founders__hint::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3fae4a;
+  box-shadow: 0 0 0 3px rgba(63, 174, 74, 0.2);
+}
+.founders__hint--tap {
+  display: none;
+}
+@media (hover: none), (max-width: 640px) {
+  .founders__hint--hover {
+    display: none;
+  }
+  .founders__hint--tap {
+    display: inline;
+  }
+}
+.fname {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+.fname.is-open {
+  z-index: 40; /* the open card sits above the other name chip */
+}
+.fname__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22em;
+  padding: 0.06em 0.3em 0.1em 0.1em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: 1.05;
+  rotate: var(--tilt);
+  box-shadow: 0 0.12em 0.3em -0.14em rgba(34, 36, 35, 0.5);
+  transition: rotate 0.4s var(--spring), transform 0.4s var(--spring);
+}
+.fname__chip img {
+  width: 0.92em;
+  height: 0.92em;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  box-shadow: 0 0 0 0.05em rgba(255, 255, 255, 0.7);
+}
+.fname:hover .fname__chip,
+.fname.is-open .fname__chip {
+  rotate: 0deg;
+  transform: translateY(-0.04em) scale(1.03);
+}
+.fname__chip:focus-visible {
+  outline-offset: 4px;
+}
+
+.fpop {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  top: calc(100% + 14px);
+  width: 340px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 30px 60px -28px rgba(34, 36, 35, 0.55), 0 0 0 1px var(--line);
+  font-size: 15px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  white-space: normal;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.97);
+  transform-origin: top left;
+  transition: opacity 0.2s, transform 0.35s var(--spring), visibility 0s linear 0.35s;
+}
+.fname.is-open .fpop {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.2s, transform 0.35s var(--spring);
+}
+.fpop::before {
+  /* little pointer toward the chip */
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 28px;
+  width: 12px;
+  height: 12px;
+  rotate: 45deg;
+  background: var(--paper);
+  box-shadow: -1px -1px 0 var(--line);
+}
+.fpop__head {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 14px 8px 8px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.5);
+  gap: 10px;
 }
-.founders__people img {
+.fpop__head img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -1632,250 +1732,87 @@ p {
   object-position: 50% 18%;
   box-shadow: 0 0 0 2px var(--accent);
 }
-.founders__people b {
+.fpop__head b {
   display: block;
+  font-size: 16px;
   font-weight: 500;
 }
-.founders__people small {
+.fpop__head small {
+  display: block;
   font-size: 13px;
   color: var(--muted);
 }
-
-.chat {
-  display: flex;
-  flex-direction: column;
-  border-radius: 24px;
-  overflow: hidden;
-  background-color: #efe9df;
-  background-image: radial-gradient(rgba(34, 36, 35, 0.07) 1px, transparent 1.2px);
-  background-size: 14px 14px;
-  box-shadow: 0 40px 80px -48px rgba(34, 36, 35, 0.55), 0 0 0 1px rgba(34, 36, 35, 0.06);
-}
-.chat__head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(247, 245, 242, 0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
-}
-.chat__faces {
-  display: flex;
-}
-.chat__faces img {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 18%;
-  border: 2px solid var(--paper);
-}
-.chat__faces img + img {
-  margin-left: -10px;
-}
-.chat__who {
-  display: grid;
-  line-height: 1.25;
-}
-.chat__who b {
-  font-weight: 500;
-  font-size: 15px;
-}
-.chat__who small {
-  font-size: 12.5px;
-  color: var(--muted);
-  min-height: 1.25em;
-}
-.chat__online {
+.fpop__x {
+  display: none;
   margin-left: auto;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #3fae4a;
-  box-shadow: 0 0 0 3px rgba(63, 174, 74, 0.2);
-}
-.chat__body {
-  list-style: none;
-  margin: 0;
-  padding: 18px 14px 10px;
-  display: grid;
-  gap: 3px;
-  min-height: 360px;
-  align-content: start;
-}
-.msg {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
-  gap: 8px;
-  align-items: end;
-  animation: msgIn 0.45s var(--spring) both;
-}
-.msg--first {
-  margin-top: 10px;
-}
-.msg:first-child {
-  margin-top: 0;
-}
-.msg__avatar img {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 18%;
+  border-radius: 9px;
+  background: var(--canvas);
+  font-size: 18px;
+  line-height: 1;
 }
-.msg__bubble {
-  position: relative;
-  justify-self: start;
-  max-width: 88%;
-  padding: 8px 12px 7px;
-  border-radius: 6px 16px 16px 6px;
-  background: var(--white);
-  box-shadow: 0 1px 1px rgba(34, 36, 35, 0.06);
-  font-size: 15px;
-  line-height: 1.4;
+.fpop__line {
+  color: var(--ink-2);
 }
-.msg--first .msg__bubble {
-  border-top-left-radius: 16px;
-}
-.msg--last .msg__bubble {
-  border-bottom-left-radius: 4px;
-}
-.msg__name {
-  display: block;
-  font-size: 12.5px;
-  font-weight: 600;
-  margin-bottom: 2px;
-  color: color-mix(in srgb, var(--accent) 70%, var(--ink));
-}
-.msg__time {
-  float: right;
-  margin: 6px 0 -3px 10px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.msg--typing .msg__bubble {
-  display: inline-flex;
-  gap: 4px;
-  padding: 12px 14px;
-}
-.msg--typing i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--muted);
-  animation: blink 1.1s infinite;
-}
-.msg--typing i:nth-child(2) {
-  animation-delay: 0.18s;
-}
-.msg--typing i:nth-child(3) {
-  animation-delay: 0.36s;
-}
-@keyframes msgIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.96);
-    transform-origin: bottom left;
-  }
-}
-.chat__reply {
-  display: grid;
-  gap: 8px;
-  padding: 10px 12px 12px;
-  opacity: 0.35;
-  pointer-events: none;
-  transition: opacity 0.5s var(--ease);
-}
-.chat__reply.is-ready {
-  opacity: 1;
-  pointer-events: auto;
-}
-.chat__quick {
+.fpop__actions {
   display: flex;
-  justify-content: flex-end;
   gap: 6px;
-  flex-wrap: wrap;
 }
-.chat__quick button {
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: var(--paper);
-  box-shadow: inset 0 0 0 1.5px var(--accent);
-  font-size: 13.5px;
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s;
-}
-.chat__quick button:hover {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-.chat__input {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 50px;
-  padding: 0 6px 0 18px;
-  border-radius: 999px;
-  background: var(--white);
-  box-shadow: 0 1px 2px rgba(34, 36, 35, 0.08);
-  color: var(--muted);
-  font-size: 15px;
-  text-align: left;
-}
-.chat__input span:first-child {
+.fpop__actions .btn {
   flex: 1;
+  min-width: 0;
 }
-.chat__send {
+.fpop__icon {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r);
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background 0.2s, color 0.2s;
+}
+.fpop__icon:hover {
   background: var(--ink);
   color: var(--paper);
-  transition: transform 0.3s var(--spring);
 }
-.chat__input:hover .chat__send {
-  transform: translateY(-2px);
+/* the second chip sits further right; open its card toward the left */
+.fname:nth-of-type(2) .fpop {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
 }
-.chat__note {
-  text-align: center;
-  font-size: 12px;
-  color: var(--muted);
+.fname:nth-of-type(2) .fpop::before {
+  left: auto;
+  right: 28px;
 }
 
-@media (max-width: 900px) {
-  .founders__grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
+/* Touch screens: the card becomes a small sheet at the bottom of the screen. */
+@media (hover: none), (max-width: 640px) {
+  .fpop,
+  .fname:nth-of-type(2) .fpop {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    top: auto;
+    bottom: 10px;
+    width: auto;
+    z-index: 70;
+    transform: translateY(24px);
+    transform-origin: bottom center;
+    box-shadow: 0 -10px 40px -16px rgba(34, 36, 35, 0.45), 0 0 0 1px var(--line);
   }
-  .founders__people {
-    display: none; /* the chat already introduces both founders */
+  .fname.is-open .fpop {
+    transform: none;
   }
-  .chat-wrap {
-    width: 100%;
-    max-width: 560px;
+  .fpop::before {
+    display: none;
   }
-}
-@media (max-width: 520px) {
-  .chat {
-    border-radius: 20px;
-  }
-  .chat__body {
-    min-height: 400px;
-    padding: 14px 10px 8px;
-  }
-  .msg__bubble {
-    font-size: 14.5px;
-    max-width: 92%;
-  }
-  .chat__quick {
-    justify-content: stretch;
-  }
-  .chat__quick button {
-    flex: 1;
+  .fpop__x {
+    display: grid;
+    place-items: center;
   }
 }
 
