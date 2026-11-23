@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { chapters } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
 
-/** vs-goods style: three glass pill groups, and a compact dropdown under "Menu". */
+/** v3 (jeppesen-style): mark + wordmark left; "Talk to the founders" + Menu right. */
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const { openContact } = useUi();
@@ -31,13 +31,20 @@ export default function Nav() {
 
   return (
     <header className="nav">
-      <div className="nav__group nav__group--left" ref={wrap}>
+      <Link to="/" className="nav__logo" aria-label="NOT TO BRAG, home" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <img src="/brand/ntb-mark-ink.png" alt="" width="52" height="28" />
+        <span className="nav__word">
+          NOT TO BRAG<sup>®</sup>
+        </span>
+      </Link>
+
+      <div className="nav__right" ref={wrap}>
+        <button className="nav__talk" onClick={() => openContact()}>
+          <span className="nav__dot" aria-hidden="true" />
+          Talk to the founders
+        </button>
         <button className="nav__menu" aria-expanded={open} aria-controls="nav-menu" onClick={() => setOpen((o) => !o)}>
           {open ? 'Close' : 'Menu'}
-          <span aria-hidden="true">{open ? '[–]' : '[+]'}</span>
-        </button>
-        <button className="nav__link" onClick={() => goTo('capabilities')}>
-          What we do
         </button>
 
         <div id="nav-menu" className={`dropdown ${open ? 'is-open' : ''}`} inert={open ? undefined : ''}>
@@ -59,19 +66,6 @@ export default function Nav() {
             <span className="dropdown__pill">Now booking</span>
           </button>
         </div>
-      </div>
-
-      <Link to="/" className="nav__logo" aria-label="NOT TO BRAG, home" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        <img src="/brand/ntb-mark-ink.png" alt="" width="52" height="28" />
-        <span className="nav__word">
-          NOT TO BRAG<sup>®</sup>
-        </span>
-      </Link>
-
-      <div className="nav__group nav__group--right">
-        <button className="nav__cta" onClick={() => openContact()}>
-          Let’s Talk
-        </button>
       </div>
     </header>
   );

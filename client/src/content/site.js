@@ -450,13 +450,30 @@ export const seo = {
 // ---------------------------------------------------------------------------
 
 export const chapters = [
-  { id: 'capabilities', label: 'What we do' },
-  { id: 'start', label: 'Where to start' },
-  { id: 'why', label: 'Why NTB' },
+  { id: 'services', label: 'What we do' },
+  { id: 'beliefs', label: 'What we believe' },
   { id: 'ai', label: 'AI, shown' },
   { id: 'process', label: 'How we work' },
   { id: 'team', label: 'The founders' },
 ];
+
+// v3 (jeppesen direction) — copy for the new sections, all taken from docs/website-content.md.
+export const v3 = {
+  heroLead: 'We build brands, create connections and develop intelligent solutions that help businesses grow.',
+  statement:
+    'Great businesses need more than good marketing. They need creative thinking, meaningful connections and smarter systems.',
+  services: [
+    { name: 'Brand Strategy', cap: 'creative', visual: 'brand', accent: 'terracotta', bullets: ['Brand discovery & positioning', 'Identity & creative direction', 'Campaign concepts & storytelling'] },
+    { name: 'Content & Social', cap: 'creative', visual: 'reel', accent: 'terracotta', bullets: ['Social media management', 'Reels, photography & video', 'Content calendars & production'] },
+    { name: 'Creator Partnerships', cap: 'creators', visual: 'creator', accent: 'pink', bullets: ['Creator discovery & sourcing', 'UGC & influencer campaigns', 'Campaign management & reporting'] },
+    { name: 'AI Agents', cap: 'ai', visual: 'chat', accent: 'periwinkle', bullets: ['AI shopping & support assistants', 'Website chat assistants', 'AI voice agents'] },
+    { name: 'Revenue Automation', cap: 'ai', visual: 'node', accent: 'periwinkle', bullets: ['Automated lead qualification', 'Follow-up & CRM workflows', 'Customer retention workflows'] },
+    { name: 'Business Intelligence', cap: 'ai', visual: 'dash', accent: 'green', bullets: ['Custom business dashboards', 'Data integrations', 'Automated reporting'] },
+  ],
+  beliefsTitle: 'Because good ideas deserve better execution.',
+  aiCaps: ['Lead qualification', 'CRM sync', 'AI voice agents', 'Shopping assistants', 'Website chat', 'Automated reporting', 'Data integrations', 'Operational dashboards'],
+  closing: { title: 'Have something in mind?', cta: 'Book a 30-minute call' },
+};
 
 export const story = {
   hero: {

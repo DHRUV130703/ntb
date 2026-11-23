@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { capabilities, contact, founders, whatWeDo } from '../content/site.js';
+import { capabilities, contact, founders, whatWeDo, faqs } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
-import { Button } from './ui.jsx';
+import { Button, PlusIcon } from './ui.jsx';
 import { Visual } from './Visuals.jsx';
 
 /* Shared drawer shell: right-side panel on desktop, bottom sheet on mobile. */
@@ -164,6 +164,22 @@ function ContactBody({ preset }) {
             </span>
           ))}
         </p>
+        <div className="sheet__faq">
+          <p className="label">Questions first?</p>
+          <div className="faq">
+            {faqs.map((f) => (
+              <details key={f.q}>
+                <summary>
+                  {f.q}
+                  <span className="faq__pm" aria-hidden="true">
+                    <PlusIcon />
+                  </span>
+                </summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

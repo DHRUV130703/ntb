@@ -11,8 +11,8 @@ import NotFound from './pages/NotFound.jsx';
 
 // v1 had separate pages. They now point into chapters of the single page.
 const LEGACY = {
-  '/what-we-do': '/#capabilities',
-  '/work': '/#capabilities',
+  '/what-we-do': '/#services',
+  '/work': '/#services',
   '/about': '/#team',
   '/approach': '/#process',
 };

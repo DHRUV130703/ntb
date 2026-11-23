@@ -1,72 +1,53 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  capabilities,
-  story,
-  home,
-  approach,
-  whatWeDo,
-  founders,
-  faqs,
-} from "../content/site.js";
-import { useUi } from "../state/ui.jsx";
-import { Button, Reveal, PlusIcon } from "../components/ui.jsx";
-import { Visual } from "../components/Visuals.jsx";
-import { OrderDashboardDemo, FlowDemo } from "../components/Demos.jsx";
+import { useEffect, useRef, useState } from 'react';
+import { founders, story, approach, about, whatWeDo, v3 } from '../content/site.js';
+import { useUi } from '../state/ui.jsx';
+import { Button, Reveal, PlusIcon } from '../components/ui.jsx';
+import { Visual } from '../components/Visuals.jsx';
+import { OrderDashboardDemo, FlowDemo } from '../components/Demos.jsx';
 
-const reduced = () =>
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const CAP_VISUAL = { creative: "brand", creators: "creator", ai: "chat" };
+const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* 1 — Hero ---------------------------------------------------------------- */
+/**
+ * Scroll progress of an element through the viewport, 0 → 1.
+ * 0 when its top reaches `start` (fraction of viewport height), 1 when its bottom reaches `end`.
+ */
+function useScrollProgress(ref, { start = 0.85, end = 0.35 } = {}) {
+  const [p, setP] = useState(() => (reduced() ? 1 : 0));
+  useEffect(() => {
+    if (reduced()) return;
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const from = vh * start;
+      const to = vh * end - r.height;
+      const v = (from - r.top) / Math.max(1, from - to);
+      setP(Math.min(1, Math.max(0, v)));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    tick();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [ref, start, end]);
+  return p;
+}
+
+/* 1 — Hero: the NTB mark assembles, then "Not to brag, but we [chip]" ------- */
 
 const PHRASE_MS = 2600;
 
-// Work objects on the hero wall. `k` = index of the phrase they belong to
-// (0 build brands, 1 find creators, 2 ship AI agents, 3 make dashboards).
-const WALL_TILES = [
-  { v: 'brand', k: 0 },
-  { v: 'creator', k: 1 },
-  { v: 'chat', k: 2 },
-  { v: 'dash', k: 3 },
-  { v: 'reel', k: 0 },
-  { v: 'node', k: 2 },
-  { v: 'creator', k: 1 },
-  { v: 'dash', k: 3 },
-];
-const WALL_ROWS = [WALL_TILES, [...WALL_TILES.slice(4), ...WALL_TILES.slice(0, 4)].reverse()];
-const PHRASE_SERVICE = ['creative', 'creators', 'ai', 'ai'];
-const PHRASE_ACCENT = ['terracotta', 'pink', 'periwinkle', 'green'];
-
-function WallRow({ tiles, dir, onPick }) {
-  const loop = [...tiles, ...tiles];
-  return (
-    <div className={`wall__row wall__row--${dir}`}>
-      <div className="wall__track">
-        {loop.map((t, n) => (
-          <button
-            key={n}
-            className="tile"
-            data-k={t.k}
-            data-accent={PHRASE_ACCENT[t.k]}
-            style={{ '--r': `${((n * 37) % 9) - 4}deg` }}
-            tabIndex={-1}
-            aria-hidden="true"
-            onClick={() => onPick(t.k)}
-          >
-            <Visual name={t.v} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/**
- * "Not to brag, but we [chip]" centred between two slow-moving rows of work objects.
- * When the chip flips, the objects for that phrase light up and the rest dim.
- */
 function Hero() {
-  const { openContact, openService } = useUi();
+  const { openContact } = useUi();
   const phrases = story.hero.phrases;
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -74,65 +55,193 @@ function Hero() {
 
   useEffect(() => {
     if (still || paused) return;
-    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), PHRASE_MS);
+    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), i === 0 ? PHRASE_MS + 900 : PHRASE_MS);
     return () => clearTimeout(t);
   }, [i, paused, still, phrases.length]);
 
   const p = phrases[i];
-  const pick = (k) => openService(PHRASE_SERVICE[k]);
-
   return (
-    <section className={`hero ${still ? 'is-still' : ''}`} aria-labelledby="hero-title">
-      <div className="wall" data-active={i} aria-hidden="true">
-        <WallRow tiles={WALL_ROWS[0]} dir="left" onPick={pick} />
-        <div className="wall__gap" />
-        <WallRow tiles={WALL_ROWS[1]} dir="right" onPick={pick} />
+    <section className={`hero3 ${still ? 'is-still' : ''}`} aria-labelledby="hero-title">
+      <div className="hero3__mark" aria-hidden="true">
+        <span className="hero3__piece hero3__piece--n" />
+        <span className="hero3__piece hero3__piece--t" />
+        <span className="hero3__piece hero3__piece--b" />
+        <span className="hero3__piece hero3__piece--whole" />
       </div>
 
-      <div className="hero__center">
-        <p className="hero__eyebrow">{story.hero.eyebrow}</p>
-        <h1 id="hero-title" className="hero__title">
+      <div className="hero3__copy">
+        <p className="hero3__eyebrow">{story.hero.eyebrow}</p>
+        <h1 id="hero-title" className="hero3__title">
           <span className="sr-only">
             {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.
           </span>
           <span aria-hidden="true">
-            <span className="hero__line">{story.hero.lead.join(' ')}</span>
-            <span className="hero__chipwrap">
-              <span key={i} className="hero__chip" data-accent={p.accent} style={{ '--tilt': i % 2 ? '2deg' : '-2deg' }}>
+            <span className="hero3__strong">{story.hero.lead[0]}</span>
+            <span className="hero3__soft">
+              {story.hero.lead[1]}{' '}
+              <span key={i} className="hero3__chip" data-accent={p.accent} style={{ '--tilt': i % 2 ? '2deg' : '-2deg' }}>
                 {p.text}
               </span>
             </span>
           </span>
         </h1>
 
-        <div
-          className="hero__segs"
-          role="tablist"
-          aria-label="What we do"
-          onPointerEnter={() => setPaused(true)}
-          onPointerLeave={() => setPaused(false)}
-        >
-          {phrases.map((x, n) => (
-            <button
-              key={x.text}
-              role="tab"
-              aria-selected={n === i}
-              className={`hero__seg ${n === i ? 'is-active' : ''} ${n < i ? 'is-done' : ''} ${paused || still ? 'is-paused' : ''}`}
-              style={{ '--ms': `${PHRASE_MS}ms` }}
-              onClick={() => setI(n)}
-            >
-              <i />
-              <span>{x.text}</span>
-            </button>
-          ))}
+        <div className="hero3__row">
+          <div
+            className="hero3__segs"
+            role="tablist"
+            aria-label="What we do"
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
+          >
+            {phrases.map((x, n) => (
+              <button
+                key={x.text}
+                role="tab"
+                aria-selected={n === i}
+                className={`hero3__seg ${n === i ? 'is-active' : ''} ${n < i ? 'is-done' : ''} ${paused || still ? 'is-paused' : ''}`}
+                style={{ '--ms': `${n === 0 && i === 0 ? PHRASE_MS + 900 : PHRASE_MS}ms` }}
+                onClick={() => setI(n)}
+              >
+                <i />
+                <span>{x.text}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="hero__foot">
+        <div className="hero3__foot">
+          <p className="hero3__lead">{v3.heroLead}</p>
           <Button variant="dark" onClick={() => openContact()}>
             {story.hero.cta}
           </Button>
-          <p className="hero__tagline">
-            {story.hero.title[0]} {story.hero.title[1]}
+        </div>
+      </div>
+
+      <p className="hero3__scroll" aria-hidden="true">
+        Scroll
+      </p>
+    </section>
+  );
+}
+
+/* 2 — Statement: words fill from grey to ink as you scroll -------------------- */
+
+function Statement() {
+  const ref = useRef(null);
+  const p = useScrollProgress(ref, { start: 0.9, end: 0.55 });
+  const words = v3.statement.split(' ');
+  const lit = Math.round(p * words.length);
+  return (
+    <section className="statement" aria-label="What we believe in">
+      <p className="statement__text" ref={ref}>
+        {words.map((w, n) => (
+          <span key={n} className={n < lit ? 'is-lit' : ''}>
+            {w}{' '}
+          </span>
+        ))}
+      </p>
+    </section>
+  );
+}
+
+/* 3 — Services: giant list, the one in the middle of the screen is active ---- */
+
+function Services() {
+  const { openService } = useUi();
+  const [active, setActive] = useState(0);
+  const items = useRef([]);
+  const list = v3.services;
+
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setActive(Number(e.target.dataset.n));
+      },
+      { rootMargin: '-46% 0px -46% 0px' },
+    );
+    items.current.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  const s = list[active];
+  return (
+    <section id="services" className="services3">
+      <div className="wrap">
+        <p className="label services3__eyebrow">What we do</p>
+        <div className="services3__grid">
+          <ol className="services3__list">
+            {list.map((x, n) => (
+              <li key={x.name} ref={(el) => (items.current[n] = el)} data-n={n}>
+                <button
+                  className={`services3__item ${n === active ? 'is-active' : ''}`}
+                  onPointerEnter={() => setActive(n)}
+                  onFocus={() => setActive(n)}
+                  onClick={() => openService(x.cap)}
+                >
+                  {x.name}
+                </button>
+                <ul className="services3__inline" aria-hidden={n !== active}>
+                  {x.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+
+          <aside className="services3__preview" aria-live="polite">
+            <div key={active} className="spreview" data-accent={s.accent}>
+              <div className="spreview__media">
+                <span className="spreview__no">
+                  {String(active + 1).padStart(2, '0')} / {String(list.length).padStart(2, '0')}
+                </span>
+                <Visual name={s.visual} />
+              </div>
+              <div className="spreview__body">
+                <h3>{s.name}</h3>
+                <ul>
+                  {s.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+                <button className="spreview__more" onClick={() => openService(s.cap)}>
+                  See everything we do here <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* 4 — Beliefs: dark band, pinned while the big line cycles -------------------- */
+
+function Beliefs() {
+  const ref = useRef(null);
+  const p = useScrollProgress(ref, { start: 0, end: 1 });
+  const beliefs = about.beliefs;
+  const idx = Math.min(beliefs.length - 1, Math.floor(p * beliefs.length));
+  return (
+    <section id="beliefs" className="beliefs" ref={ref} style={{ '--n': beliefs.length }}>
+      <div className="beliefs__pin">
+        <div className="wrap beliefs__grid">
+          <div>
+            <p className="label beliefs__eyebrow">What we believe</p>
+            <h2 className="h-lg beliefs__title">{v3.beliefsTitle}</h2>
+            <ol className="beliefs__cells">
+              {beliefs.map((b, n) => (
+                <li key={b} className={n === idx ? 'is-on' : n < idx ? 'is-done' : ''}>
+                  <span>{String(n + 1).padStart(2, '0')}</span>
+                  {b}
+                </li>
+              ))}
+            </ol>
+          </div>
+          <p key={idx} className="beliefs__big" aria-live="polite">
+            {beliefs[idx]}
           </p>
         </div>
       </div>
@@ -140,246 +249,82 @@ function Hero() {
   );
 }
 
-/* 2 — Capabilities ---------------------------------------------------------- */
+/* 5 — AI, shown: one featured card + capability marquee ---------------------- */
 
-function Capabilities() {
-  const { openService } = useUi();
-  return (
-    <section id="capabilities" className="chapter">
-      <div className="wrap">
-        <Reveal className="chapter__head">
-          <h2 className="h-lg">{story.capabilities.title}</h2>
-        </Reveal>
-      </div>
-      <div className="rail" role="list">
-        {capabilities.map((c, i) => (
-          <Reveal key={c.id} role="listitem" delay={i * 90}>
-            <button
-              className="pcard"
-              data-accent={c.accent}
-              onClick={() => openService(c.id)}
-              aria-label={`${c.title}: see services`}
-            >
-              <span className="pcard__media">
-                <span className="pcard__no">{c.no}</span>
-                <Visual name={CAP_VISUAL[c.id]} />
-              </span>
-              <span className="pcard__info">
-                <span>
-                  <span className="pcard__title">{c.title}</span>
-                  <span className="pcard__line">{c.line}</span>
-                </span>
-                <span className="tag">{story.capabilities.tags[c.id]}</span>
-              </span>
-            </button>
-          </Reveal>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* 3 — Where to start (uppercase list + cursor preview) ------------------------ */
-
-function StartList() {
-  const { openContact } = useUi();
-  const [active, setActive] = useState(null);
-  const preview = useRef(null);
-  const list = useRef(null);
-
-  useEffect(() => {
-    const el = list.current;
-    if (!el || reduced() || !window.matchMedia("(hover: hover)").matches)
-      return;
-    const onMove = (e) => {
-      const r = el.getBoundingClientRect();
-      preview.current?.style.setProperty(
-        "transform",
-        `translate(${e.clientX - r.left + 24}px, ${e.clientY - r.top - 60}px)`,
-      );
-    };
-    el.addEventListener("pointermove", onMove);
-    return () => el.removeEventListener("pointermove", onMove);
-  }, []);
-
-  const item = active != null ? story.start.items[active] : null;
-  return (
-    <section id="start" className="chapter chapter--grid">
-      <p className="label label--center">{story.start.eyebrow}</p>
-      <div
-        className="biglist"
-        ref={list}
-        onPointerLeave={() => setActive(null)}
-      >
-        {story.start.items.map((s, i) => (
-          <button
-            key={s.label}
-            className={`biglist__item ${active === i ? "is-active" : ""}`}
-            onPointerEnter={() => setActive(i)}
-            onFocus={() => setActive(i)}
-            onBlur={() => setActive(null)}
-            onClick={() => openContact({ interest: s.interest })}
-          >
-            {s.label}
-          </button>
-        ))}
-        <div
-          ref={preview}
-          className={`biglist__preview ${item ? "is-on" : ""}`}
-          data-accent={item?.accent}
-          aria-hidden="true"
-        >
-          {item && (
-            <>
-              <div className="biglist__visual">
-                <Visual name={item.visual} />
-              </div>
-              <span className="biglist__line">{item.line}</span>
-            </>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* 4 — Why (tilted cards on charcoal) --------------------------------------- */
-
-const WHY_STYLE = [
-  { bg: "var(--paper)", r: -9, x: "4%", y: "6%" },
-  { bg: "var(--green)", r: 6, x: "27%", y: "40%" },
-  { bg: "var(--terracotta)", r: -5, x: "50%", y: "4%" },
-  { bg: "var(--periwinkle)", r: 9, x: "74%", y: "30%" },
-];
-
-function Why() {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      ([e]) => e.isIntersecting && setInView(true),
-      { threshold: 0.3 },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <section id="why" className={`why ${inView ? "is-in" : ""}`} ref={ref}>
-      <div className="why__cards">
-        {home.why.points.map((p, i) => (
-          <article
-            key={p.title}
-            className="why__card"
-            style={{
-              "--bg": WHY_STYLE[i].bg,
-              "--r": `${WHY_STYLE[i].r}deg`,
-              left: WHY_STYLE[i].x,
-              top: WHY_STYLE[i].y,
-              "--i": i,
-            }}
-          >
-            <h3>{p.title}</h3>
-            <p>{p.body}</p>
-          </article>
-        ))}
-      </div>
-      <div className="wrap why__foot">
-        <h2 className="h-lg">{story.why.title}</h2>
-        <p className="label">{story.why.eyebrow}</p>
-      </div>
-    </section>
-  );
-}
-
-/* 5 — AI, shown not told ------------------------------------------------- */
-
-function AiShowcase() {
+function AiFeature() {
   const { openContact } = useUi();
   const [how, setHow] = useState(false);
   return (
-    <section id="ai" className="chapter">
+    <section id="ai" className="chapter ai3">
       <div className="wrap">
-        <Reveal className="chapter__head chapter__head--split">
-          <h2 className="h-lg">{story.ai.title}</h2>
-          <Button
-            variant="dark"
-            onClick={() => openContact({ interest: "AI & Automation" })}
-          >
-            {whatWeDo.ai.cta}
-          </Button>
-        </Reveal>
-        <div className="duo">
-          <Reveal className="hcard hcard--sand">
-            <div className="hcard__media">
+        <p className="label ai3__eyebrow">AI, shown not told</p>
+        <Reveal className="feature">
+          <div className="feature__media">
+            <OrderDashboardDemo />
+            <div className="feature__flow">
               <FlowDemo />
             </div>
-            <div className="hcard__foot">
-              <span className="tag tag--outline">{story.ai.flowTag}</span>
-              <h3 className="h-md">{story.ai.flowTitle}</h3>
-            </div>
-          </Reveal>
-          <Reveal className="hcard hcard--paper" delay={120}>
-            <div className="hcard__media">
-              <OrderDashboardDemo />
-            </div>
-            <div className="hcard__foot">
-              <span className="tag tag--outline">{story.ai.dashTag}</span>
+          </div>
+          <div className="feature__body">
+            <div className="feature__tags">
+              <span className="tag tag--outline">AI &amp; Business Intelligence</span>
               <span className="tag" data-accent="pink">
                 Demo data
               </span>
-              <h3 className="h-md">{story.ai.dashTitle}</h3>
             </div>
-          </Reveal>
-        </div>
-        <div className="how">
-          <button
-            className="how__toggle"
-            aria-expanded={how}
-            onClick={() => setHow((h) => !h)}
-          >
-            <PlusIcon /> {story.ai.howLabel}
-          </button>
-          {how && (
-            <ol className="how__list">
-              {whatWeDo.ai.approach.map((a) => (
-                <li key={a}>{a}</li>
-              ))}
-            </ol>
-          )}
+            <h2 className="h-lg">{story.ai.title}</h2>
+            <p className="feature__lead">{whatWeDo.ai.lead}</p>
+            <button className="how__toggle" aria-expanded={how} onClick={() => setHow((h) => !h)}>
+              <PlusIcon /> {story.ai.howLabel}
+            </button>
+            {how && (
+              <ol className="how__list">
+                {whatWeDo.ai.approach.map((a) => (
+                  <li key={a}>{a}</li>
+                ))}
+              </ol>
+            )}
+            <div>
+              <Button variant="dark" onClick={() => openContact({ interest: 'AI & Automation' })}>
+                {whatWeDo.ai.cta}
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+      <div className="capmarquee" aria-label={v3.aiCaps.join(', ')}>
+        <div className="capmarquee__track" aria-hidden="true">
+          {[...v3.aiCaps, ...v3.aiCaps].map((c, n) => (
+            <span key={n}>{c}</span>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-/* 6 — Process ------------------------------------------------------------ */
+/* 6 — How we work: a numbered line that fills as you scroll ------------------- */
 
-function Process() {
-  const [open, setOpen] = useState(0);
+function ProcessLine() {
+  const ref = useRef(null);
+  const p = useScrollProgress(ref, { start: 0.8, end: 0.5 });
+  const steps = approach.steps;
   return (
-    <section id="process" className="chapter chapter--paper">
+    <section id="process" className="chapter process3">
       <div className="wrap">
-        <Reveal className="chapter__head">
-          <h2 className="h-lg">{story.process.title}</h2>
-        </Reveal>
-        <ol className="steps">
-          {approach.steps.map((s, i) => (
-            <li key={s.no} className={`step ${open === i ? "is-open" : ""}`}>
-              <button
-                className="step__btn"
-                aria-expanded={open === i}
-                onPointerEnter={() => setOpen(i)}
-                onFocus={() => setOpen(i)}
-                onClick={() => setOpen(i)}
-              >
-                <span className="step__no">{s.no}</span>
-                <span className="step__title">{s.title}</span>
-              </button>
-              <p className="step__body">{s.body}</p>
+        <p className="label process3__eyebrow">How we work</p>
+        <h2 className="h-lg process3__title">{story.process.title}</h2>
+        <ol className="pline" ref={ref} style={{ '--p': p }}>
+          {steps.map((s, n) => (
+            <li key={s.no} className={p >= n / (steps.length - 1) - 0.001 ? 'is-on' : ''}>
+              <span className="pline__dot" />
+              <span className="pline__no">{s.no}</span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
             </li>
           ))}
         </ol>
-        <div className="chips">
+        <div className="chips process3__chips">
           {approach.engagements.items.map((e) => (
             <span key={e} className="chip">
               {e}
@@ -391,7 +336,7 @@ function Process() {
   );
 }
 
-/* 7 — Founders: one sentence, names as chips ------------------------------ */
+/* 7 — Founders: one sentence with name chips -------------------------------- */
 
 const MailIcon = () => (
   <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -488,7 +433,7 @@ function Founders() {
 
   return (
     <section id="team" className="chapter founders" ref={wrap}>
-      <div className="wrap">
+      <div className="wrap founders__layout">
         <Reveal>
           <h2 className="label founders__eyebrow">{story.team.eyebrow}</h2>
           <p className="founders__sentence">
@@ -503,32 +448,30 @@ function Founders() {
             <span className="founders__hint--tap">Tap a name to reach them directly.</span>
           </p>
         </Reveal>
+        {/* The NTB mark splits into two halves, one per founder; the half for the open name lights up. */}
+        <div className={`fmark ${open ? `is-${open}` : ''}`} aria-hidden="true">
+          <span className="fmark__half fmark__half--a" />
+          <span className="fmark__half fmark__half--b" />
+        </div>
       </div>
     </section>
   );
 }
 
-/* 8 — FAQ + closing -------------------------------------------------------- */
 
-function Faq() {
+/* 8 — Closing ------------------------------------------------------------ */
+
+function Closing() {
+  const { openContact } = useUi();
   return (
-    <section id="faq" className="chapter chapter--tight">
-      <div className="wrap faq-wrap">
-        <h2 className="h-md">Questions</h2>
-        <div className="faq">
-          {faqs.map((f) => (
-            <details key={f.q}>
-              <summary>
-                {f.q}
-                <span className="faq__pm">
-                  <PlusIcon />
-                </span>
-              </summary>
-              <p>{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </div>
+    <section className="closing3">
+      <Reveal className="wrap closing3__inner">
+        <h2 className="closing3__title">{v3.closing.title}</h2>
+        <p className="closing3__body">{story.closing.body}</p>
+        <Button variant="dark" onClick={() => openContact()}>
+          {v3.closing.cta}
+        </Button>
+      </Reveal>
     </section>
   );
 }
@@ -537,13 +480,13 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <Capabilities />
-      <StartList />
-      <Why />
-      <AiShowcase />
-      <Process />
+      <Statement />
+      <Services />
+      <Beliefs />
+      <AiFeature />
+      <ProcessLine />
       <Founders />
-      <Faq />
+      <Closing />
     </>
   );
 }

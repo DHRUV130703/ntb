@@ -129,6 +129,41 @@ Analytics, loaded only after "Accept all". If the founders don't want analytics,
 - Logo assets: `client/public/brand/` (NTB mark in cream/ink/olive). Gmail/Workspace logo exports
   in `out/`.
 
+## Proposal v3 — jeppesen.dev direction (status: APPROVED and BUILT 2026-11-23; supersedes the v2 chapter table above where they differ)
+
+Code map (v3): `pages/Home.jsx` sections Hero → Statement → Services → Beliefs → AiFeature →
+ProcessLine → Founders → Closing, plus `useScrollProgress(ref, {start, end})` that drives the
+statement words, the pinned beliefs band and the process line. Copy for new sections lives in `v3`
+in `content/site.js`. Clash Grotesk is loaded from Fontshare in `client/index.html`
+(`--display`). Paper grain = `body::after` SVG noise. Old sections (capability rail, start list,
+tilted why-cards, AI duo, step cards, FAQ section) were removed; FAQ now sits in the Contact
+drawer under "Questions first?".
+
+Reference studied 2026-11-23: https://jeppesen.dev/ (one-partner branding/web studio). What makes it
+work: a single grainy paper colour (#F2EDE4) + near-black ink (#252525); one display face
+(Clash Grotesk, weight ~580, with a regular-weight continuation line); the brand mark animates as
+the opening; scroll drives the storytelling (a statement whose words fill in as you scroll, a giant
+services list that highlights as you scroll with a sticky preview); calm centred closing line with
+one button; footer = dark band, giant wordmark with the logo mark set into it.
+
+Rules kept: hero copy "Not to brag, but we [chip]" unchanged; pink cookie card + "Book a call" card
+stay; no invented clients, testimonials or metrics (jeppesen's logo grid, testimonials and case
+metrics are NOT copied); founder photos stay avatar-sized.
+
+| # | Section | v3 change (jeppesen pattern) |
+|---|---|---|
+| 0 | Nav + surface | Nav slims to: NTB mark left; right = dark "Talk to the founders" button + "Menu". Whole site gets a subtle paper **grain** texture; palette tightens to paper + ink, accents only on chips/cards. Display font → **Clash Grotesk** (free, Fontshare) for headlines; Figtree stays for body. |
+| 1 | Hero | **NTB mark intro**: on load the N, T and B blocks of the logo slide in and lock together (≈1.2s), then the headline appears. Left-aligned, two weights: "Not to brag," (bold) / "but we [chip]" (regular, chip still flips). One short lead line under it (from the copy deck: "We build brands, create connections and develop intelligent solutions that help businesses grow.") + Let's Talk. Right side: the big NTB mark stays as a slow-breathing object instead of the moving wall. |
+| 2 | **New: statement** | Full-screen statement whose words fill from grey to ink as you scroll: "Great businesses need more than good marketing. They need creative thinking, meaningful connections and smarter systems." (copy deck, Introduction). |
+| 3 | Services (replaces capability cards + "Where should we start?") | Giant stacked list of six services in Clash at ~100px, grey until active: Brand Strategy · Content & Social · Creator Partnerships · AI Agents · Revenue Automation · Business Intelligence. The item in the middle of the screen turns ink as you scroll; a **sticky preview card** on the right swaps to that service's mockup + 3 bullets. Click → existing service drawer. Two old chapters become one. |
+| 4 | Why NTB / beliefs (dark band) | Dark pinned section in jeppesen's "clients" layout: left a grid of 6 bordered cells (the six beliefs), right one large line that cycles through them as you scroll. Replaces the dropping tilted cards. |
+| 5 | AI, shown | One "featured work"-style card: demo media left (workflow + dashboard, labelled DEMO), text right, and a slow marquee of capabilities underneath (Lead qualification · CRM sync · Voice agents · Reporting) instead of metrics. |
+| 6 | How we work | Five steps as a horizontal numbered line that fills as you scroll (Discover → Optimise); engagement pills below. |
+| 7 | Founders | Keep the name-chip sentence; set it in Clash and add a small NTB-mark morph beside it (mark splits into two halves, one per founder). |
+| 8 | Closing + footer | Centred closing line in Clash: "Have something in mind?" + one button "Book a 30-minute call" (opens Contact). Footer: dark band, giant "NOT TO BRAG" wordmark with the NTB mark set into it, founders' emails large on the right, small links in the corners. FAQ moves into the Contact drawer as a "Questions" tab. |
+
+Effort: one focused pass; existing drawers, contact API and copy are reused.
+
 ## Stack and layout
 
 ```
@@ -159,8 +194,8 @@ Commands (from repo root):
   Sender is dhruv@nottobrag.org via Gmail SMTP with an App Password. If sending breaks, run
   `npm run verify-smtp -w server` (reads server/.env) to test the login locally.
 
-- v2 single-page redesign + "Not to brag, but we …" hero are **live on https://nottobrag.app**
-  (pushed 2026-11-21, commit ca8d42a). Checked desktop 1024–1440, tablet 820, mobile 375.
+- Live: v2 (pushed 2026-11-21). Built locally 2026-11-23, not yet pushed: founder titles, founders
+  sentence (v2.6), hero moving wall (v2.7, now replaced) and **v3 jeppesen redesign**.
 - No portfolio projects yet. Pending from founders: company LinkedIn URL, real projects,
   analytics yes/no (decides the cookie banner).
 
