@@ -51,10 +51,12 @@ export function UiProvider({ children }) {
   // Lock page scroll while a sheet is open.
   useEffect(() => {
     if (!sheet) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    // Safari (iOS) only honours the lock when both <html> and <body> are clipped.
+    const els = [document.documentElement, document.body];
+    const prev = els.map((el) => el.style.overflow);
+    els.forEach((el) => (el.style.overflow = 'hidden'));
     return () => {
-      document.body.style.overflow = prev;
+      els.forEach((el, i) => (el.style.overflow = prev[i]));
     };
   }, [sheet]);
 

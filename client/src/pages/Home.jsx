@@ -127,8 +127,6 @@ function Hero() {
           ))}
         </div>
 
-        <p className="hero3__eyebrow">{story.hero.eyebrow}</p>
-
         <h1 id="hero-title" className="hero3__title">
           <span className="sr-only">
             {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.

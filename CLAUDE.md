@@ -159,6 +159,8 @@ drawer under "Questions first?".
   content, UGC campaigns, Creator shortlist, AI shopping assistant, Voice agents, Live dashboard,
   Weekly reports) that drift gently; the ones belonging to the current phrase fill with its accent.
   Phones: 4 stickers in a band above the headline.
+  **No eyebrow line above the headline** (founders removed "Independent creative & technology
+  studio · Mumbai" on 2026-11-23: "absolutely no need of this").
 - Services = the v4 vs-goods list via the reusable `HangingList` component: six services in giant
   uppercase on a grid, active line ink, hanging preview card (mockup + caption bar with the three
   bullets), auto-cycles while on screen, hover takes over, click opens the service drawer, plus
@@ -168,6 +170,16 @@ drawer under "Questions first?".
 phrase tabs and footer links have ≥44px tap targets; slim two-button cookie card on phones (no
 paragraph); stickers anchored with `translate: calc(var(--x) * -1%)` so they never overflow;
 statement and closing get less vertical padding; AI card shows only the dashboard on phones.
+
+**Safari / WebKit pass (2026-11-23):** tested section by section in Playwright WebKit vs Chromium
+(1440 and 390). Rules that came out of it:
+- **Never use `text-wrap: pretty`.** In WebKit it crashed the page at phone width when the
+  statement's words re-render on scroll ("A problem repeatedly occurred" on iPhone). `balance` on
+  headings is fine.
+- `:hover` rules live inside `@media (hover: hover)` so taps on iPhone/iPad don't leave hover stuck.
+- Drawer scroll lock sets `overflow: hidden` on both `<html>` and `<body>` (iOS needs both); the
+  scrim has `touch-action: none`.
+- Vite's build adds `-webkit-backdrop-filter` / `-webkit-mask-image`; inputs stay ≥16px (no iOS zoom).
 
 **v4 hero (superseded; the list now lives in Services):**
 jeppesen's preloader (NTB mark slices lock together, once per session) + paper grain, then

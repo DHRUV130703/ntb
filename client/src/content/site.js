@@ -477,7 +477,6 @@ export const v3 = {
 
 export const story = {
   hero: {
-    eyebrow: 'Independent creative & technology studio · Mumbai',
     title: ['Creative thinking. Intelligent technology.', 'Meaningful growth.'],
     lead: ['Not to brag,', 'but we'],
     // Rotating chip in the hero. `service` opens that capability's drawer; `visual` is the matching card.
