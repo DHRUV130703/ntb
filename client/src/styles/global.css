@@ -410,7 +410,7 @@ p {
   }
 }
 
-/* Hero: "Not to brag, but we [chip]" ------------------------------------------ */
+/* Hero v2.7: "Not to brag, but we [chip]" between two moving rows of work ---- */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -421,27 +421,133 @@ p {
 }
 .hero {
   position: relative;
-  min-height: max(640px, 100svh);
-  background:
-    radial-gradient(60% 50% at 85% 30%, rgba(255, 255, 255, 0.55), transparent 70%),
-    radial-gradient(50% 60% at 10% 90%, rgba(218, 209, 195, 0.9), transparent 70%),
-    #efe7da;
-  overflow: hidden;
-}
-.hero__inner {
-  position: relative;
-  max-width: var(--max);
-  margin: 0 auto;
-  min-height: max(640px, 100svh);
-  padding: 110px var(--gutter) clamp(24px, 4vw, 40px);
+  min-height: max(680px, 100svh);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(280px, 28vw, 380px);
-  align-items: center;
-  gap: clamp(24px, 4vw, 64px);
+  place-items: center;
+  padding: 84px 0 28px;
+  background:
+    radial-gradient(70% 45% at 50% 50%, #f7f2ea 0%, rgba(247, 242, 234, 0) 70%),
+    #ece4d6;
+  overflow: hidden;
+  isolation: isolate;
 }
-.hero__copy {
-  align-self: end;
-  padding-bottom: clamp(0px, 4vh, 40px);
+
+/* The wall: two rows, top and bottom, scrolling in opposite directions */
+.wall {
+  position: absolute;
+  inset: 72px 0 0;
+  z-index: -1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding-bottom: 18px;
+}
+.wall__gap {
+  min-height: 0;
+}
+.wall__row {
+  overflow: hidden;
+  padding: 18px 0;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.wall__track {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: max-content;
+  animation: wallLeft 70s linear infinite;
+}
+.wall__row--right .wall__track {
+  animation-name: wallRight;
+  animation-duration: 80s;
+}
+.wall__row:hover .wall__track {
+  animation-play-state: paused;
+}
+@keyframes wallLeft {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes wallRight {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.tile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(170px, 15vw, 230px);
+  height: clamp(120px, 10.5vw, 160px);
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--accent);
+  rotate: var(--r);
+  box-shadow: 0 24px 40px -26px rgba(34, 36, 35, 0.55);
+  opacity: 0.3;
+  filter: saturate(0.25);
+  scale: 0.94;
+  transition: opacity 0.6s var(--ease), filter 0.6s var(--ease), scale 0.6s var(--spring), rotate 0.4s var(--ease);
+  overflow: hidden;
+  pointer-events: auto;
+}
+.tile .v {
+  box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.4);
+}
+.tile .v-reel {
+  width: 30%;
+}
+.tile .v-reel .v-reel__cap {
+  display: none;
+}
+.tile .v-brand {
+  aspect-ratio: 16 / 9.5;
+}
+.tile .v-dash__bars {
+  height: 46px;
+}
+.tile .v-chat {
+  gap: 4px;
+  padding: 9px;
+  font-size: 10.5px;
+}
+.tile .v-chat__typing {
+  display: none;
+}
+.tile:hover {
+  rotate: 0deg;
+  scale: 1.04;
+}
+/* light up the objects that belong to the active phrase */
+.wall[data-active='0'] .tile[data-k='0'],
+.wall[data-active='1'] .tile[data-k='1'],
+.wall[data-active='2'] .tile[data-k='2'],
+.wall[data-active='3'] .tile[data-k='3'] {
+  opacity: 1;
+  filter: none;
+  scale: 1;
+}
+
+/* Centred copy */
+.hero__center {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 1040px;
+  padding: 0 var(--gutter);
+}
+.hero__center::before {
+  /* soft halo so moving tiles never fight the headline */
+  content: '';
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(242, 236, 226, 0.95), rgba(242, 236, 226, 0));
 }
 .hero__eyebrow {
   font-size: 13px;
@@ -450,25 +556,29 @@ p {
   margin-bottom: 18px;
 }
 .hero__title {
-  /* sized so the longest phrase ("make dashboards") fits beside the card */
-  font-size: clamp(56px, min(7vw, 13svh), 124px);
-  line-height: 0.95;
+  display: grid;
+  justify-items: center;
+  font-size: clamp(48px, min(7vw, 11svh), 112px);
+  line-height: 0.98;
   letter-spacing: -0.045em;
   font-weight: 500;
 }
+.hero__line {
+  display: block;
+}
 .hero__chipwrap {
-  display: inline-block;
-  vertical-align: baseline;
+  display: block;
+  margin-top: 0.08em;
 }
 .hero__chip {
   display: inline-block;
-  padding: 0.02em 0.22em 0.1em;
-  border-radius: 0.16em;
+  padding: 0.02em 0.24em 0.1em;
+  border-radius: 0.18em;
   background: var(--accent);
   color: var(--accent-ink);
   rotate: var(--tilt);
   white-space: nowrap;
-  box-shadow: 0 0.12em 0.3em -0.12em rgba(34, 36, 35, 0.45);
+  box-shadow: 0 0.14em 0.34em -0.14em rgba(34, 36, 35, 0.45);
   animation: chipIn 0.7s var(--spring) both;
 }
 @keyframes chipIn {
@@ -481,8 +591,8 @@ p {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
-  max-width: 640px;
-  margin-top: clamp(28px, 4vw, 44px);
+  width: min(600px, 100%);
+  margin-top: clamp(26px, 3.4vw, 40px);
 }
 .hero__seg {
   display: grid;
@@ -490,7 +600,7 @@ p {
   font-size: 12.5px;
   font-weight: 500;
   color: var(--muted);
-  text-align: left;
+  text-align: center;
   transition: color 0.3s;
 }
 .hero__seg i {
@@ -530,129 +640,62 @@ p {
 .hero__foot {
   display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: center;
+  gap: 16px;
   flex-wrap: wrap;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 .hero__tagline {
   font-size: 14px;
   color: var(--muted);
-  max-width: 34ch;
-}
-.hero__card {
-  align-self: center;
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--white);
-  box-shadow: 0 40px 70px -40px rgba(34, 36, 35, 0.6);
-  rotate: 3deg;
-  animation: cardIn 0.8s var(--spring) both;
-  transition: rotate 0.5s var(--ease), translate 0.5s var(--ease);
-}
-.hero__card:hover {
-  rotate: 0deg;
-  translate: 0 -4px;
-}
-@keyframes cardIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px) rotate(-6deg) scale(0.94);
-  }
-}
-.hero__card-media {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1 / 1;
-  padding: 16%;
-  background: var(--accent);
-}
-.hero__card-media .v {
-  rotate: -4deg;
-  box-shadow: 0 24px 40px -16px rgba(0, 0, 0, 0.35);
-}
-.hero__card-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px 16px;
+  max-width: 30ch;
   text-align: left;
 }
-.hero__card-info b {
-  display: block;
-  font-weight: 500;
-  font-size: 17px;
+.hero.is-still .wall__track {
+  animation: none;
 }
-.hero__card-info small {
-  font-size: 13.5px;
-  color: var(--muted);
-}
-.hero__card-go {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--canvas);
-}
-@media (max-width: 900px) {
-  .hero__inner {
-    grid-template-columns: 1fr;
-    align-content: space-between;
-    padding-top: 92px;
-    gap: 28px;
+
+@media (max-width: 760px) {
+  .hero {
+    padding: 76px 0 20px;
   }
-  .hero__card {
-    order: -1;
-    justify-self: end;
-    width: min(64%, 300px);
-    margin-top: 8px;
+  .wall {
+    inset: 64px 0 0;
   }
-  .hero__card-media {
-    aspect-ratio: 16 / 10;
-    padding: 8% 14%;
+  .wall__row {
+    padding: 12px 0;
   }
-  .hero__card-info {
-    padding: 10px 12px 12px;
+  .wall__track {
+    gap: 12px;
+    animation-duration: 50s;
   }
-  .hero__card-info b {
-    font-size: 15px;
+  .wall__row--right .wall__track {
+    animation-duration: 58s;
   }
-  .hero__card-info small {
-    font-size: 12px;
+  .tile {
+    width: 140px;
+    height: 100px;
+    padding: 10px 12px;
+    border-radius: 14px;
   }
-  .hero__copy {
-    padding-bottom: 0;
-  }
-}
-@media (min-width: 521px) and (max-width: 900px) {
-  .hero__inner {
-    align-content: center;
-    gap: 48px;
+  .tile > .v {
+    zoom: 0.7; /* shrink the mockup itself, not just its frame */
   }
   .hero__title {
-    font-size: clamp(56px, 10.5vw, 96px);
+    font-size: clamp(42px, 12.5vw, 64px);
   }
-  .hero__card {
-    width: min(50%, 340px);
+  .hero__line {
+    max-width: 8.5em;
   }
-}
-@media (max-width: 520px) {
-  .hero__title {
-    font-size: clamp(48px, 14.5vw, 72px);
-  }
-  /* keep the longest phrase on screen */
   .hero__chip {
-    font-size: 0.74em;
-    margin-top: 0.08em;
+    font-size: 0.8em;
   }
   .hero__segs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 12px;
+  }
+  .hero__tagline {
+    text-align: center;
   }
 }
 

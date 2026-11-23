@@ -21,7 +21,50 @@ const CAP_VISUAL = { creative: "brand", creators: "creator", ai: "chat" };
 
 const PHRASE_MS = 2600;
 
-/** "Not to brag, but we [chip]" — the chip flips through what we do; a matching card follows. */
+// Work objects on the hero wall. `k` = index of the phrase they belong to
+// (0 build brands, 1 find creators, 2 ship AI agents, 3 make dashboards).
+const WALL_TILES = [
+  { v: 'brand', k: 0 },
+  { v: 'creator', k: 1 },
+  { v: 'chat', k: 2 },
+  { v: 'dash', k: 3 },
+  { v: 'reel', k: 0 },
+  { v: 'node', k: 2 },
+  { v: 'creator', k: 1 },
+  { v: 'dash', k: 3 },
+];
+const WALL_ROWS = [WALL_TILES, [...WALL_TILES.slice(4), ...WALL_TILES.slice(0, 4)].reverse()];
+const PHRASE_SERVICE = ['creative', 'creators', 'ai', 'ai'];
+const PHRASE_ACCENT = ['terracotta', 'pink', 'periwinkle', 'green'];
+
+function WallRow({ tiles, dir, onPick }) {
+  const loop = [...tiles, ...tiles];
+  return (
+    <div className={`wall__row wall__row--${dir}`}>
+      <div className="wall__track">
+        {loop.map((t, n) => (
+          <button
+            key={n}
+            className="tile"
+            data-k={t.k}
+            data-accent={PHRASE_ACCENT[t.k]}
+            style={{ '--r': `${((n * 37) % 9) - 4}deg` }}
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={() => onPick(t.k)}
+          >
+            <Visual name={t.v} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * "Not to brag, but we [chip]" centred between two slow-moving rows of work objects.
+ * When the chip flips, the objects for that phrase light up and the rest dim.
+ */
 function Hero() {
   const { openContact, openService } = useUi();
   const phrases = story.hero.phrases;
@@ -31,95 +74,67 @@ function Hero() {
 
   useEffect(() => {
     if (still || paused) return;
-    const t = setTimeout(
-      () => setI((n) => (n + 1) % phrases.length),
-      PHRASE_MS,
-    );
+    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), PHRASE_MS);
     return () => clearTimeout(t);
   }, [i, paused, still, phrases.length]);
 
   const p = phrases[i];
+  const pick = (k) => openService(PHRASE_SERVICE[k]);
+
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="hero__inner">
-        <div className="hero__copy">
-          <p className="hero__eyebrow">{story.hero.eyebrow}</p>
-          <h1 id="hero-title" className="hero__title">
-            <span className="sr-only">
-              {story.hero.lead.join(" ")}{" "}
-              {phrases.map((x) => x.text).join(", ")}.
-            </span>
-            <span aria-hidden="true">
-              {story.hero.lead[0]}
-              <br />
-              {story.hero.lead[1]}{" "}
-              <span className="hero__chipwrap">
-                <span
-                  key={i}
-                  className="hero__chip"
-                  data-accent={p.accent}
-                  style={{ "--tilt": i % 2 ? "2.5deg" : "-2.5deg" }}
-                >
-                  {p.text}
-                </span>
+    <section className={`hero ${still ? 'is-still' : ''}`} aria-labelledby="hero-title">
+      <div className="wall" data-active={i} aria-hidden="true">
+        <WallRow tiles={WALL_ROWS[0]} dir="left" onPick={pick} />
+        <div className="wall__gap" />
+        <WallRow tiles={WALL_ROWS[1]} dir="right" onPick={pick} />
+      </div>
+
+      <div className="hero__center">
+        <p className="hero__eyebrow">{story.hero.eyebrow}</p>
+        <h1 id="hero-title" className="hero__title">
+          <span className="sr-only">
+            {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.
+          </span>
+          <span aria-hidden="true">
+            <span className="hero__line">{story.hero.lead.join(' ')}</span>
+            <span className="hero__chipwrap">
+              <span key={i} className="hero__chip" data-accent={p.accent} style={{ '--tilt': i % 2 ? '2deg' : '-2deg' }}>
+                {p.text}
               </span>
             </span>
-          </h1>
+          </span>
+        </h1>
 
-          <div
-            className="hero__segs"
-            role="tablist"
-            aria-label="What we do"
-            onPointerEnter={() => setPaused(true)}
-            onPointerLeave={() => setPaused(false)}
-          >
-            {phrases.map((x, n) => (
-              <button
-                key={x.text}
-                role="tab"
-                aria-selected={n === i}
-                className={`hero__seg ${n === i ? "is-active" : ""} ${n < i ? "is-done" : ""} ${paused || still ? "is-paused" : ""}`}
-                style={{ "--ms": `${PHRASE_MS}ms` }}
-                onClick={() => setI(n)}
-              >
-                <i />
-                <span>{x.text}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="hero__foot">
-            <Button variant="dark" onClick={() => openContact()}>
-              {story.hero.cta}
-            </Button>
-            <p className="hero__tagline">
-              {story.hero.title[0]} {story.hero.title[1]}
-            </p>
-          </div>
-        </div>
-
-        <button
-          key={i}
-          className="hero__card"
-          data-accent={p.accent}
+        <div
+          className="hero__segs"
+          role="tablist"
+          aria-label="What we do"
           onPointerEnter={() => setPaused(true)}
           onPointerLeave={() => setPaused(false)}
-          onClick={() => openService(p.service)}
-          aria-label={`${p.text}: see services`}
         >
-          <span className="hero__card-media">
-            <Visual name={p.visual} />
-          </span>
-          <span className="hero__card-info">
-            <span>
-              <b>{p.text.replace(/^\w/, (c) => c.toUpperCase())}</b>
-              <small>{p.caption}</small>
-            </span>
-            <span className="hero__card-go" aria-hidden="true">
-              <PlusIcon />
-            </span>
-          </span>
-        </button>
+          {phrases.map((x, n) => (
+            <button
+              key={x.text}
+              role="tab"
+              aria-selected={n === i}
+              className={`hero__seg ${n === i ? 'is-active' : ''} ${n < i ? 'is-done' : ''} ${paused || still ? 'is-paused' : ''}`}
+              style={{ '--ms': `${PHRASE_MS}ms` }}
+              onClick={() => setI(n)}
+            >
+              <i />
+              <span>{x.text}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="hero__foot">
+          <Button variant="dark" onClick={() => openContact()}>
+            {story.hero.cta}
+          </Button>
+          <p className="hero__tagline">
+            {story.hero.title[0]} {story.hero.title[1]}
+          </p>
+        </div>
       </div>
     </section>
   );
