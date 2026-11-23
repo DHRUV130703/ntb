@@ -729,6 +729,9 @@ p {
     inset: 76px 0 auto 0;
     height: 150px;
   }
+  .sticker {
+    translate: none; /* phone positions below are hand-placed */
+  }
   .sticker:nth-child(n + 5) {
     display: none;
   }
