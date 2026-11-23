@@ -152,6 +152,17 @@ drawer under "Questions first?".
   you're building →" (opens Contact) + founders listed small with name, title and email; base row
   has ©, location, Instagram, Manage cookies, Back to top.
 
+**v3.2 (2026-11-23, founders picked from options after "too plain" / "beliefs section is bad"):**
+- Hero = headline at the top + **expanding strip** of four tall accent cards (one per phrase).
+  The card for the current chip widens (flex-grow 8) to show its mockup, title, caption, → and a
+  progress line; the others shrink to slim tabs with vertical labels. Hover = select + pause,
+  click active card = open that service drawer. Bottom bar: lead line + Let's Talk. Hero grid
+  uses `minmax(0,1fr)` so the strip can never widen the page on phones.
+- Beliefs = **card deck**: canvas background, pinned; left eyebrow + "Because good ideas deserve
+  better execution." + "04 / 06"; right six accent cards (cream, terracotta, pink, periwinkle,
+  green, olive) that slide up from off-screen and land on a slightly rotated pile as you scroll
+  (`BELIEF_LOOK` in Home.jsx). No repeated sentences.
+
 Reference studied 2026-11-23: https://jeppesen.dev/ (one-partner branding/web studio). What makes it
 work: a single grainy paper colour (#F2EDE4) + near-black ink (#252525); one display face
 (Clash Grotesk, weight ~580, with a regular-weight continuation line); the brand mark animates as

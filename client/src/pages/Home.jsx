@@ -66,7 +66,7 @@ function Intro({ onDone }) {
 }
 
 function Hero() {
-  const { openContact } = useUi();
+  const { openContact, openService } = useUi();
   const phrases = story.hero.phrases;
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -117,34 +117,54 @@ function Hero() {
           </span>
         </h1>
 
-        <div className="hero3__bar">
-          <p className="hero3__lead">{v3.heroLead}</p>
-          <div
-            className="hero3__segs"
-            role="tablist"
-            aria-label="What we do"
-            onPointerEnter={() => setPaused(true)}
-            onPointerLeave={() => setPaused(false)}
-          >
-            {phrases.map((x, n) => (
+        <div className="hstrip" onPointerLeave={() => setPaused(false)}>
+          {phrases.map((x, n) => {
+            const on = n === i;
+            return (
               <button
                 key={x.text}
-                role="tab"
-                aria-selected={n === i}
-                className={`hero3__seg ${n === i ? 'is-active' : ''} ${n < i ? 'is-done' : ''} ${paused || still || intro ? 'is-paused' : ''}`}
-                style={{ '--ms': `${PHRASE_MS}ms` }}
-                onClick={() => setI(n)}
+                className={`hcard ${on ? 'is-on' : ''}`}
+                data-accent={x.accent}
+                aria-pressed={on}
+                aria-label={on ? `${x.text}: see services` : `Show ${x.text}`}
+                onPointerEnter={() => {
+                  setI(n);
+                  setPaused(true);
+                }}
+                onFocus={() => setI(n)}
+                onClick={() => (on ? openService(x.service) : setI(n))}
               >
-                <i />
-                <span>{x.text}</span>
+                <span className="hcard__tab">{x.text}</span>
+                <span className="hcard__media" aria-hidden="true">
+                  <Visual name={x.visual} />
+                </span>
+                <span className="hcard__foot">
+                  <span>
+                    <b>{x.text.replace(/^\w/, (c) => c.toUpperCase())}</b>
+                    <small>{x.caption}</small>
+                  </span>
+                  <span className="hcard__go" aria-hidden="true">
+                    →
+                  </span>
+                </span>
+                {on && (
+                  <span
+                    key={`p${i}`}
+                    className={`hcard__progress ${paused || still || intro ? 'is-paused' : ''}`}
+                    style={{ '--ms': `${PHRASE_MS}ms` }}
+                    aria-hidden="true"
+                  />
+                )}
               </button>
-            ))}
-          </div>
-          <div className="hero3__cta">
-            <Button variant="dark" onClick={() => openContact()}>
-              {story.hero.cta}
-            </Button>
-          </div>
+            );
+          })}
+        </div>
+
+        <div className="hero3__bar">
+          <p className="hero3__lead">{v3.heroLead}</p>
+          <Button variant="dark" onClick={() => openContact()}>
+            {story.hero.cta}
+          </Button>
         </div>
       </section>
     </>
@@ -243,37 +263,59 @@ function Services() {
   );
 }
 
-/* 4 — Beliefs: one belief per screen, pinned while you scroll ------------- */
+/* 4 — Beliefs: a deck of cards that land on a pile as you scroll ------------ */
+
+const BELIEF_LOOK = [
+  { accent: 'cream', r: -4 },
+  { accent: 'terracotta', r: 3 },
+  { accent: 'pink', r: -2 },
+  { accent: 'periwinkle', r: 4 },
+  { accent: 'green', r: -3 },
+  { accent: 'olive', r: 2 },
+];
 
 function Beliefs() {
   const ref = useRef(null);
   const p = useScrollProgress(ref, { start: 0, end: 1 });
   const beliefs = about.beliefs;
   const n = beliefs.length;
-  const idx = Math.min(n - 1, Math.floor(p * n));
+  // Card 0 is on the pile from the start; the last card lands at the end of the section.
+  const pos = p * (n - 1);
+  const idx = Math.min(n - 1, Math.round(pos));
   return (
     <section id="beliefs" className="beliefs" ref={ref} style={{ '--n': n }}>
       <div className="beliefs__pin">
-        <div className="wrap beliefs__frame">
-          <div className="beliefs__top">
+        <div className="wrap beliefs__layout">
+          <div className="beliefs__intro">
             <p className="label">What we believe</p>
+            <h2 className="h-lg">{v3.beliefsTitle}</h2>
             <p className="beliefs__count" aria-hidden="true">
               <b>{String(idx + 1).padStart(2, '0')}</b> / {String(n).padStart(2, '0')}
             </p>
           </div>
-          <p key={idx} className="beliefs__big" aria-live="polite">
-            {beliefs[idx]}
-          </p>
-          <div className="beliefs__bottom">
-            <ol className="beliefs__bars" aria-label="Our beliefs">
-              {beliefs.map((b, k) => (
-                <li key={b} className={k < idx ? 'is-done' : k === idx ? 'is-on' : ''}>
-                  <span className="sr-only">{b}</span>
+          <ol className="deck" aria-label="Our beliefs">
+            {beliefs.map((b, k) => {
+              const t = Math.min(1, Math.max(0, pos - (k - 1)));
+              const depth = Math.max(0, pos - k);
+              const look = BELIEF_LOOK[k % BELIEF_LOOK.length];
+              return (
+                <li
+                  key={b}
+                  className="deck__card"
+                  data-accent={look.accent}
+                  style={{
+                    zIndex: k,
+                    transform: `translateY(${(1 - t) * 100}vh) rotate(${look.r * t}deg) scale(${1 - Math.min(depth, 3) * 0.035})`,
+                    visibility: t > 0 ? 'visible' : 'hidden',
+                  }}
+                >
+                  <span className="deck__no">{String(k + 1).padStart(2, '0')}</span>
+                  <p className="deck__text">{b}</p>
+                  <span className="deck__sign">NOT TO BRAG® believes</span>
                 </li>
-              ))}
-            </ol>
-            <p className="beliefs__foot">{v3.beliefsTitle}</p>
-          </div>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </section>
