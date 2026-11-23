@@ -65,11 +65,25 @@ function Intro({ onDone }) {
   );
 }
 
+// Sticker tags floating in the hero's top area. `k` = phrase index they belong to.
+const STICKERS = [
+  { t: 'Brand strategy', k: 0, x: 46, y: 18, r: -6 },
+  { t: 'Visual identity', k: 0, x: 74, y: 30, r: 5 },
+  { t: 'Reels & content', k: 0, x: 58, y: 42, r: -3 },
+  { t: 'UGC campaigns', k: 1, x: 84, y: 14, r: 7 },
+  { t: 'Creator shortlist', k: 1, x: 36, y: 34, r: 4 },
+  { t: 'AI shopping assistant', k: 2, x: 63, y: 24, r: -5 },
+  { t: 'Voice agents', k: 2, x: 88, y: 40, r: -4 },
+  { t: 'Live dashboard', k: 3, x: 50, y: 6, r: 3 },
+  { t: 'Weekly reports', k: 3, x: 76, y: 50, r: -7 },
+];
+const PHRASE_ACCENT = ['terracotta', 'pink', 'periwinkle', 'green'];
+
 function Hero() {
-  const { openContact, openService } = useUi();
+  const { openContact } = useUi();
   const phrases = story.hero.phrases;
   const [i, setI] = useState(0);
-  const [hovering, setHovering] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [still] = useState(reduced);
   const [intro, setIntro] = useState(() => {
     if (reduced()) return false;
@@ -88,29 +102,119 @@ function Hero() {
     setIntro(false);
   }, []);
 
+  useEffect(() => {
+    if (still || paused || intro) return;
+    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), PHRASE_MS);
+    return () => clearTimeout(t);
+  }, [i, paused, still, intro, phrases.length]);
+
+  const p = phrases[i];
+  return (
+    <>
+      {intro && <Intro onDone={endIntro} />}
+      <section className={`hero3 ${intro ? 'is-waiting' : 'is-ready'}`} aria-labelledby="hero-title">
+        <div className="stickers" aria-hidden="true">
+          {STICKERS.map((st, n) => (
+            <span
+              key={st.t}
+              className={`sticker ${st.k === i ? 'is-on' : ''}`}
+              data-accent={PHRASE_ACCENT[st.k]}
+              style={{ left: `${st.x}%`, top: `${st.y}%`, '--r': `${st.r}deg`, '--d': `${(n % 5) * 0.7}s` }}
+            >
+              <i />
+              {st.t}
+            </span>
+          ))}
+        </div>
+
+        <p className="hero3__eyebrow">{story.hero.eyebrow}</p>
+
+        <h1 id="hero-title" className="hero3__title">
+          <span className="sr-only">
+            {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.
+          </span>
+          <span aria-hidden="true">
+            <span className="hero3__line">
+              <span className="hero3__strong">{story.hero.lead[0]}</span> <span className="hero3__soft">{story.hero.lead[1]}</span>
+            </span>
+            <span className="hero3__line">
+              <span key={i} className="hero3__chip" data-accent={p.accent} style={{ '--tilt': i % 2 ? '1.5deg' : '-1.5deg' }}>
+                {p.text}
+              </span>
+            </span>
+          </span>
+        </h1>
+
+        <div className="hero3__bar">
+          <p className="hero3__lead">{v3.heroLead}</p>
+          <div
+            className="hero3__segs"
+            role="tablist"
+            aria-label="What we do"
+            onPointerEnter={() => setPaused(true)}
+            onPointerLeave={() => setPaused(false)}
+          >
+            {phrases.map((x, n) => (
+              <button
+                key={x.text}
+                role="tab"
+                aria-selected={n === i}
+                className={`hero3__seg ${n === i ? 'is-active' : ''} ${n < i ? 'is-done' : ''} ${paused || still || intro ? 'is-paused' : ''}`}
+                style={{ '--ms': `${PHRASE_MS}ms` }}
+                onClick={() => setI(n)}
+              >
+                <i />
+                <span>{x.text}</span>
+              </button>
+            ))}
+          </div>
+          <div className="hero3__cta">
+            <Button variant="dark" onClick={() => openContact()}>
+              {story.hero.cta}
+            </Button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/**
+ * vs-goods "MOCKUP LIBRARY" list: giant uppercase lines, the active one in ink, with a preview
+ * card (mockup + caption bar) hanging off it. Auto-cycles while on screen; hover takes over and
+ * the card follows the cursor. items: [{ label, accent, visual, caption, onClick }]
+ */
+function HangingList({ items, interval = PHRASE_MS }) {
+  const [i, setI] = useState(0);
+  const [hovering, setHovering] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [still] = useState(reduced);
   const list = useRef(null);
-  const items = useRef([]);
+  const els = useRef([]);
   const preview = useRef(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
 
-  // Auto-cycle like the chip used to; hovering takes over.
   useEffect(() => {
-    if (still || hovering || intro) return;
-    const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), PHRASE_MS);
-    return () => clearTimeout(t);
-  }, [i, hovering, still, intro, phrases.length]);
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 });
+    io.observe(list.current);
+    return () => io.disconnect();
+  }, []);
 
-  // When not hovering, park the preview card on the active line (vs-goods position).
+  useEffect(() => {
+    if (still || hovering || !inView) return;
+    const t = setTimeout(() => setI((n) => (n + 1) % items.length), interval);
+    return () => clearTimeout(t);
+  }, [i, hovering, inView, still, items.length, interval]);
+
   useEffect(() => {
     if (hovering) return;
     const place = () => {
-      const el = items.current[i];
+      const el = els.current[i];
       const box = list.current;
       if (!el || !box) return;
       const r = el.getBoundingClientRect();
       const b = box.getBoundingClientRect();
       const ph = preview.current?.offsetHeight || 0;
-      // Hang off the active line, but never past the bottom of the list (keeps the bar clear).
       const y = Math.min(r.top - b.top + r.height * 0.55, b.height - ph + 12);
       setPos({ x: r.left - b.left + r.width * 0.42, y });
     };
@@ -126,62 +230,33 @@ function Hero() {
     setPos({ x: e.clientX - b.left + 24, y: Math.min(e.clientY - b.top + 18, b.height - ph + 12) });
   };
 
-  const p = phrases[i];
+  const cur = items[i];
   return (
-    <>
-      {intro && <Intro onDone={endIntro} />}
-      <section className={`hero4 ${intro ? 'is-waiting' : 'is-ready'}`} aria-labelledby="hero-title">
-        <p className="hero4__eyebrow">{story.hero.eyebrow}</p>
-
-        <h1 id="hero-title" className="hero4__head">
-          <span className="sr-only">
-            {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.
-          </span>
-          <span aria-hidden="true">
-            <span className="hero4__strong">{story.hero.lead[0]}</span> {story.hero.lead[1]}
-          </span>
-        </h1>
-
-        <div
-          className={`hero4__list ${hovering ? 'is-hovering' : ''}`}
-          ref={list}
-          onPointerMove={onMove}
-          onPointerLeave={() => setHovering(false)}
+    <div className={`hlist ${hovering ? 'is-hovering' : ''}`} ref={list} onPointerMove={onMove} onPointerLeave={() => setHovering(false)}>
+      {items.map((x, n) => (
+        <button
+          key={x.label}
+          ref={(el) => (els.current[n] = el)}
+          className={`hlist__item ${n === i ? 'is-active' : ''}`}
+          onPointerEnter={() => {
+            setHovering(true);
+            setI(n);
+          }}
+          onFocus={() => setI(n)}
+          onClick={x.onClick}
         >
-          {phrases.map((x, n) => (
-            <button
-              key={x.text}
-              ref={(el) => (items.current[n] = el)}
-              className={`hero4__item ${n === i ? 'is-active' : ''}`}
-              onPointerEnter={() => {
-                setHovering(true);
-                setI(n);
-              }}
-              onFocus={() => setI(n)}
-              onClick={() => openService(x.service)}
-            >
-              {x.text}
-            </button>
-          ))}
-
-          <div className="hpreview" ref={preview} style={{ transform: `translate3d(${pos.x}px, ${pos.y}px, 0)` }} aria-hidden="true">
-            <div key={i} className="hpreview__inner" data-accent={p.accent}>
-              <div className="hpreview__media">
-                <Visual name={p.visual} />
-              </div>
-              <div className="hpreview__caption">{p.caption}</div>
-            </div>
+          {x.label}
+        </button>
+      ))}
+      <div className="hpreview" ref={preview} style={{ transform: `translate3d(${pos.x}px, ${pos.y}px, 0)` }} aria-hidden="true">
+        <div key={i} className="hpreview__inner" data-accent={cur.accent}>
+          <div className="hpreview__media">
+            <Visual name={cur.visual} />
           </div>
+          <div className="hpreview__caption">{cur.caption}</div>
         </div>
-
-        <div className="hero4__bar">
-          <p className="hero4__lead">{v3.heroLead}</p>
-          <Button variant="dark" onClick={() => openContact()}>
-            {story.hero.cta}
-          </Button>
-        </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }
 
@@ -205,73 +280,28 @@ function Statement() {
   );
 }
 
-/* 3 — Services: giant list, the one in the middle of the screen is active ---- */
+/* 3 — Services: the vs-goods list (moved here from the hero) -------------- */
 
 function Services() {
-  const { openService } = useUi();
-  const [active, setActive] = useState(0);
-  const items = useRef([]);
-  const list = v3.services;
-
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) if (e.isIntersecting) setActive(Number(e.target.dataset.n));
-      },
-      { rootMargin: '-46% 0px -46% 0px' },
-    );
-    items.current.forEach((el) => el && io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  const s = list[active];
+  const { openService, openContact } = useUi();
+  const items = v3.services.map((x) => ({
+    label: x.name,
+    accent: x.accent,
+    visual: x.visual,
+    caption: x.bullets.join(' · '),
+    onClick: () => openService(x.cap),
+  }));
   return (
-    <section id="services" className="services3">
-      <div className="wrap">
-        <p className="label services3__eyebrow">What we do</p>
-        <div className="services3__grid">
-          <ol className="services3__list">
-            {list.map((x, n) => (
-              <li key={x.name} ref={(el) => (items.current[n] = el)} data-n={n}>
-                <button
-                  className={`services3__item ${n === active ? 'is-active' : ''}`}
-                  onPointerEnter={() => setActive(n)}
-                  onFocus={() => setActive(n)}
-                  onClick={() => openService(x.cap)}
-                >
-                  {x.name}
-                </button>
-                <ul className="services3__inline" aria-hidden={n !== active}>
-                  {x.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ol>
-
-          <aside className="services3__preview" aria-live="polite">
-            <div key={active} className="spreview" data-accent={s.accent}>
-              <div className="spreview__media">
-                <span className="spreview__no">
-                  {String(active + 1).padStart(2, '0')} / {String(list.length).padStart(2, '0')}
-                </span>
-                <Visual name={s.visual} />
-              </div>
-              <div className="spreview__body">
-                <h3>{s.name}</h3>
-                <ul>
-                  {s.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-                <button className="spreview__more" onClick={() => openService(s.cap)}>
-                  See everything we do here <span aria-hidden="true">→</span>
-                </button>
-              </div>
-            </div>
-          </aside>
-        </div>
+    <section id="services" className="services4">
+      <div className="wrap services4__head">
+        <p className="label">What we do</p>
+        <p className="services4__hint">Pick one to see everything we do there.</p>
+      </div>
+      <HangingList items={items} />
+      <div className="wrap services4__foot">
+        <Button variant="dark" onClick={() => openContact()}>
+          Not sure where to start? Let’s talk
+        </Button>
       </div>
     </section>
   );

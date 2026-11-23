@@ -152,7 +152,19 @@ drawer under "Questions first?".
   you're building →" (opens Contact) + founders listed small with name, title and email; base row
   has ©, location, Instagram, Manage cookies, Back to top.
 
-**v4 hero (2026-11-23, founders: "copy straight up elements" from jeppesen.dev + vs-goods.store):**
+**v5 (2026-11-23, current): hero back to the chip headline + the v4 list moved to Services.**
+- Hero = jeppesen preloader, then left-aligned "**Not to brag,** but we" + flipping chip + bottom
+  bar (lead | four phrase segments | Let's Talk) on a **grid background**. The empty top area holds
+  **floating sticker tags** (`STICKERS` in Home.jsx: Brand strategy, Visual identity, Reels &
+  content, UGC campaigns, Creator shortlist, AI shopping assistant, Voice agents, Live dashboard,
+  Weekly reports) that drift gently; the ones belonging to the current phrase fill with its accent.
+  Phones: 4 stickers in a band above the headline.
+- Services = the v4 vs-goods list via the reusable `HangingList` component: six services in giant
+  uppercase on a grid, active line ink, hanging preview card (mockup + caption bar with the three
+  bullets), auto-cycles while on screen, hover takes over, click opens the service drawer, plus
+  "Not sure where to start? Let's talk".
+
+**v4 hero (superseded; the list now lives in Services):**
 jeppesen's preloader (NTB mark slices lock together, once per session) + paper grain, then
 vs-goods' "MOCKUP LIBRARY" list as the hero: centred eyebrow, "**Not to brag,** but we" (Clash
 56px), then the four phrases as a giant uppercase list (BUILD BRANDS / FIND CREATORS / SHIP AI
