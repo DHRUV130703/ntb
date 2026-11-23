@@ -152,7 +152,18 @@ drawer under "Questions first?".
   you're building →" (opens Contact) + founders listed small with name, title and email; base row
   has ©, location, Instagram, Manage cookies, Back to top.
 
-**v3.2 (2026-11-23, founders picked from options after "too plain" / "beliefs section is bad"):**
+**v4 hero (2026-11-23, founders: "copy straight up elements" from jeppesen.dev + vs-goods.store):**
+jeppesen's preloader (NTB mark slices lock together, once per session) + paper grain, then
+vs-goods' "MOCKUP LIBRARY" list as the hero: centred eyebrow, "**Not to brag,** but we" (Clash
+56px), then the four phrases as a giant uppercase list (BUILD BRANDS / FIND CREATORS / SHIP AI
+AGENTS / MAKE DASHBOARDS); active line ink, others 17% grey; auto-cycles every 2.6s. A preview card
+(accent media panel with the mockup + separate accent caption bar, like vs-goods' photo + orange
+"New tools. Same creative guts." bar) hangs off the active line; on hover it follows the cursor
+and hovering takes over the cycle; click = open that service. Card is clamped inside the list so
+it never covers the bottom bar (lead line + Let's Talk). Grid-line background fading to the edges.
+Phones: list ~10vw, card sits below the list. Copy is unchanged; only the presentation moved.
+
+**v3.2 (superseded hero; beliefs deck still current):**
 - Hero = headline at the top + **expanding strip** of four tall accent cards (one per phrase).
   The card for the current chip widens (flex-grow 8) to show its mockup, title, caption, → and a
   progress line; the others shrink to slim tabs with vertical labels. Hover = select + pause,

@@ -69,7 +69,7 @@ function Hero() {
   const { openContact, openService } = useUi();
   const phrases = story.hero.phrases;
   const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hovering, setHovering] = useState(false);
   const [still] = useState(reduced);
   const [intro, setIntro] = useState(() => {
     if (reduced()) return false;
@@ -88,80 +88,94 @@ function Hero() {
     setIntro(false);
   }, []);
 
+  const list = useRef(null);
+  const items = useRef([]);
+  const preview = useRef(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  // Auto-cycle like the chip used to; hovering takes over.
   useEffect(() => {
-    if (still || paused || intro) return;
+    if (still || hovering || intro) return;
     const t = setTimeout(() => setI((n) => (n + 1) % phrases.length), PHRASE_MS);
     return () => clearTimeout(t);
-  }, [i, paused, still, intro, phrases.length]);
+  }, [i, hovering, still, intro, phrases.length]);
+
+  // When not hovering, park the preview card on the active line (vs-goods position).
+  useEffect(() => {
+    if (hovering) return;
+    const place = () => {
+      const el = items.current[i];
+      const box = list.current;
+      if (!el || !box) return;
+      const r = el.getBoundingClientRect();
+      const b = box.getBoundingClientRect();
+      const ph = preview.current?.offsetHeight || 0;
+      // Hang off the active line, but never past the bottom of the list (keeps the bar clear).
+      const y = Math.min(r.top - b.top + r.height * 0.55, b.height - ph + 12);
+      setPos({ x: r.left - b.left + r.width * 0.42, y });
+    };
+    place();
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, [i, hovering]);
+
+  const onMove = (e) => {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+    const b = list.current.getBoundingClientRect();
+    const ph = preview.current?.offsetHeight || 0;
+    setPos({ x: e.clientX - b.left + 24, y: Math.min(e.clientY - b.top + 18, b.height - ph + 12) });
+  };
 
   const p = phrases[i];
   return (
     <>
       {intro && <Intro onDone={endIntro} />}
-      <section className={`hero3 ${intro ? 'is-waiting' : 'is-ready'}`} aria-labelledby="hero-title">
-        <p className="hero3__eyebrow">{story.hero.eyebrow}</p>
+      <section className={`hero4 ${intro ? 'is-waiting' : 'is-ready'}`} aria-labelledby="hero-title">
+        <p className="hero4__eyebrow">{story.hero.eyebrow}</p>
 
-        <h1 id="hero-title" className="hero3__title">
+        <h1 id="hero-title" className="hero4__head">
           <span className="sr-only">
             {story.hero.lead.join(' ')} {phrases.map((x) => x.text).join(', ')}.
           </span>
           <span aria-hidden="true">
-            <span className="hero3__line">
-              <span className="hero3__strong">{story.hero.lead[0]}</span> <span className="hero3__soft">{story.hero.lead[1]}</span>
-            </span>
-            <span className="hero3__line">
-              <span key={i} className="hero3__chip" data-accent={p.accent} style={{ '--tilt': i % 2 ? '1.5deg' : '-1.5deg' }}>
-                {p.text}
-              </span>
-            </span>
+            <span className="hero4__strong">{story.hero.lead[0]}</span> {story.hero.lead[1]}
           </span>
         </h1>
 
-        <div className="hstrip" onPointerLeave={() => setPaused(false)}>
-          {phrases.map((x, n) => {
-            const on = n === i;
-            return (
-              <button
-                key={x.text}
-                className={`hcard ${on ? 'is-on' : ''}`}
-                data-accent={x.accent}
-                aria-pressed={on}
-                aria-label={on ? `${x.text}: see services` : `Show ${x.text}`}
-                onPointerEnter={() => {
-                  setI(n);
-                  setPaused(true);
-                }}
-                onFocus={() => setI(n)}
-                onClick={() => (on ? openService(x.service) : setI(n))}
-              >
-                <span className="hcard__tab">{x.text}</span>
-                <span className="hcard__media" aria-hidden="true">
-                  <Visual name={x.visual} />
-                </span>
-                <span className="hcard__foot">
-                  <span>
-                    <b>{x.text.replace(/^\w/, (c) => c.toUpperCase())}</b>
-                    <small>{x.caption}</small>
-                  </span>
-                  <span className="hcard__go" aria-hidden="true">
-                    →
-                  </span>
-                </span>
-                {on && (
-                  <span
-                    key={`p${i}`}
-                    className={`hcard__progress ${paused || still || intro ? 'is-paused' : ''}`}
-                    style={{ '--ms': `${PHRASE_MS}ms` }}
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            );
-          })}
+        <div
+          className={`hero4__list ${hovering ? 'is-hovering' : ''}`}
+          ref={list}
+          onPointerMove={onMove}
+          onPointerLeave={() => setHovering(false)}
+        >
+          {phrases.map((x, n) => (
+            <button
+              key={x.text}
+              ref={(el) => (items.current[n] = el)}
+              className={`hero4__item ${n === i ? 'is-active' : ''}`}
+              onPointerEnter={() => {
+                setHovering(true);
+                setI(n);
+              }}
+              onFocus={() => setI(n)}
+              onClick={() => openService(x.service)}
+            >
+              {x.text}
+            </button>
+          ))}
+
+          <div className="hpreview" ref={preview} style={{ transform: `translate3d(${pos.x}px, ${pos.y}px, 0)` }} aria-hidden="true">
+            <div key={i} className="hpreview__inner" data-accent={p.accent}>
+              <div className="hpreview__media">
+                <Visual name={p.visual} />
+              </div>
+              <div className="hpreview__caption">{p.caption}</div>
+            </div>
+          </div>
         </div>
 
-        <div className="hero3__bar">
-          <p className="hero3__lead">{v3.heroLead}</p>
+        <div className="hero4__bar">
+          <p className="hero4__lead">{v3.heroLead}</p>
           <Button variant="dark" onClick={() => openContact()}>
             {story.hero.cta}
           </Button>
