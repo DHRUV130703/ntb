@@ -196,6 +196,9 @@ mark) "over the top". They picked these concepts from three options each:
   pre-routed) + mail and call icon buttons. Title/lead lines come from `story.team`. The old
   chips, popovers, `fmark` and `story.team.sentence` use are removed (the data is still in
   site.js). **Photos stay avatar-sized.**
+- **Footer people list uses icons, not written emails** (2026-11-26): each founder row = name +
+  title on the left, 44px mail and call icon buttons on the right (`footer3__icons`; `MailIcon` /
+  `PhoneIcon` now live in `components/ui.jsx`). Don't print email addresses as text on the site.
 - **Nav: hamburger icon** instead of the "Menu" text (3 lines that turn into a cross; same small
   dropdown panel; `aria-label` Open/Close menu). On phones/touch the nav controls and menu rows are
   44px tall.

@@ -1,5 +1,6 @@
 import { brand, founders } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
+import { MailIcon, PhoneIcon } from './ui.jsx';
 
 /**
  * v3.1 footer: one clear contact line (opens the Contact drawer), founders' emails small and
@@ -24,7 +25,14 @@ export default function Footer() {
                 <b>{f.name}</b>
                 <small>{f.title}</small>
               </span>
-              <a href={`mailto:${f.email}`}>{f.email}</a>
+              <span className="footer3__icons">
+                <a href={`mailto:${f.email}`} aria-label={`Email ${f.name}`} title={f.email}>
+                  <MailIcon />
+                </a>
+                <a href={`tel:${f.tel}`} aria-label={`Call ${f.name}`} title={f.phone}>
+                  <PhoneIcon />
+                </a>
+              </span>
             </li>
           ))}
         </ul>

@@ -17,6 +17,28 @@ export function PlusIcon({ size = 14 }) {
   );
 }
 
+export function MailIcon({ size = 17 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="2.5" y="4.5" width="15" height="11" rx="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="m3.5 6 6.5 5 6.5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function PhoneIcon({ size = 17 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M6.2 3.5h-1.7a1.5 1.5 0 0 0-1.5 1.6C3.4 11.3 8.7 16.6 14.9 17a1.5 1.5 0 0 0 1.6-1.5v-1.7a1 1 0 0 0-.8-1l-2.6-.6a1 1 0 0 0-1 .3l-1 1.1a10 10 0 0 1-4.7-4.7l1.1-1a1 1 0 0 0 .3-1l-.6-2.6a1 1 0 0 0-1-.8Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /** Split button (label cell + return-arrow cell), as on vs-goods.store. */
 export function Button({ to, href, children, variant = 'dark', className = '', ...rest }) {
   const cls = `btn btn--${variant} ${className}`.trim();
