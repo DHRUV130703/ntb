@@ -15,6 +15,15 @@ in the same turn.
 - Philosophy: *We don't just create ideas. We help turn them into something meaningful for businesses.*
 - Three capabilities: **01 Creative & Marketing**, **02 Creators & Collaborations**,
   **03 AI & Business Intelligence**.
+- **Sales kit** (2026-11-26): [docs/sales/README.md](docs/sales/README.md): offer menu with 6
+  packages + Growth Audit entry offer (**Content & Social / social media management is NOT offered
+  for now**, founders 2026-11-26: keep it out of the pitch deck/PDF, sales docs and emails. **Only the PDF
+  was changed on request; the website and Instagram posts still list it. Don't remove it there until
+  the founders say so.**) ([offers.md](docs/sales/offers.md), prices are `[₹__]`
+  placeholders until the founders set them; ranges there are suggestions), outreach emails/DMs,
+  discovery script, objections, proposal template, pipeline. Pitch deck = Slides artifact
+  https://claude.ai/artifact/Qe1X9x4v5g812mcZsGM92i (15 slides, talk track in speaker notes).
+- Instagram launch posts (teaser, reveal carousel, founders carousel): `out/instagram/post1–3`.
 - Site structure (v2, see "Redesign v2"): **one scrolling page** + a Contact drawer. The copy deck's
   six "pages" become chapters of that page; deep detail lives in drawers, not new pages.
 
@@ -87,7 +96,7 @@ detail only when the visitor asks for it.
 | 4 | **Why NTB** | Charcoal section; 4 tilted cards float/settle on scroll (like the awards cards). One short line under it. | Card titles only: "A creative perspective." etc.; line: "Because good ideas deserve better execution." |
 | 5 | **AI, shown not told** | Two big highlight cards side by side (like "Branding In Motion / Flowforms"): left an animated workflow (form → AI qualify → CRM → notify); right the live order dashboard, labelled **DEMO DATA**. | Tag + title per card. Implementation steps hidden behind "How we build it" toggle. |
 | 6 | **How we work** | One row of 5 compact numbered steps (Discover → Optimise); hover/tap reveals the sentence. Engagement types as small pill chips beneath. | Step names only by default. |
-| 7 | **The founders** (v2.6, 2026-11-23; founders picked it after rejecting big portrait cards and the group-chat version) | **One typographic sentence**, same language as the hero: "Not to brag, but [● Riddhi] makes brands impossible to overlook, and [● Dhruv] builds the systems that make businesses work smarter." Names are tilted accent pill chips with a tiny round avatar inside (`story.team.sentence` holds the text parts). Hover/focus a chip (desktop) → small popover card under it: avatar, name, title, `short` line, "Talk to {name}" split button (Contact pre-routed) + email + call; Dhruv's opens toward the left. Touch/phones: tap a chip → same card as a bottom sheet with ✕; tap outside or Esc closes. Under the sentence: "Two 23-year-olds…" line + a small hint pill ("Hover/Tap a name to reach them directly"). **Rule: photos stay small (avatars), never hero-sized.** | One sentence + one line. |
+| 7 | **The founders** (v2.6, superseded by v6 below; 2026-11-23; founders picked it after rejecting big portrait cards and the group-chat version) | **One typographic sentence**, same language as the hero: "Not to brag, but [● Riddhi] makes brands impossible to overlook, and [● Dhruv] builds the systems that make businesses work smarter." Names are tilted accent pill chips with a tiny round avatar inside (`story.team.sentence` holds the text parts). Hover/focus a chip (desktop) → small popover card under it: avatar, name, title, `short` line, "Talk to {name}" split button (Contact pre-routed) + email + call; Dhruv's opens toward the left. Touch/phones: tap a chip → same card as a bottom sheet with ✕; tap outside or Esc closes. Under the sentence: "Two 23-year-olds…" line + a small hint pill ("Hover/Tap a name to reach them directly"). **Rule: photos stay small (avatars), never hero-sized.** | One sentence + one line. |
 | 8 | **Closing + footer** | Charcoal footer: "Have something in mind?" + Let's Talk; huge "NOT TO BRAG®" wordmark across full width between thin rules; corners: emails (left), Instagram/LinkedIn (right), "Manage cookies", ©. FAQ as a compact accordion just above the footer. | — |
 | 9 | **Floating card stack** (persistent, bottom-right, closable) | Like vs-goods' "Now or never" card: "Now taking on projects · Book a call" with both founders' avatars and a split button → Contact drawer. Sits under the cookie card on first visit. | 1 line. |
 
@@ -161,7 +170,7 @@ drawer under "Questions first?".
   Phones: 4 stickers in a band above the headline.
   **No eyebrow line above the headline** (founders removed "Independent creative & technology
   studio · Mumbai" on 2026-11-23: "absolutely no need of this").
-- Services = the v4 vs-goods list via the reusable `HangingList` component: six services in giant
+- (Superseded by v6, see below.) Services = the v4 vs-goods list via the reusable `HangingList` component: six services in giant
   uppercase on a grid, active line ink, hanging preview card (mockup + caption bar with the three
   bullets), auto-cycles while on screen, hover takes over, click opens the service drawer, plus
   "Not sure where to start? Let's talk".
@@ -170,6 +179,26 @@ drawer under "Questions first?".
 phrase tabs and footer links have ≥44px tap targets; slim two-button cookie card on phones (no
 paragraph); stickers anchored with `translate: calc(var(--x) * -1%)` so they never overflow;
 statement and closing get less vertical padding; AI card shows only the dashboard on phones.
+
+**v6 (2026-11-26, current for Services, Founders and the nav menu).** The founders called the
+giant services list with a card hanging over the text "too messy" on mobile and laptop, the
+"Menu" text button unnecessary, and the founders sentence (name chips, hover popovers, split NTB
+mark) "over the top". They picked these concepts from three options each:
+- **Services = calm list + one preview card** (`Services` in Home.jsx, classes `svlist*`):
+  numbered rows with the service name and an arrow; the active row gets a 4px accent bar. On
+  laptops a sticky card on the right (mockup on the service colour, three plain lines, an
+  "Explore {service}" button); hovering a row picks it and clicking opens the service drawer. On
+  phones/narrow windows (<900px) the picked row opens the same card inline (tap to switch; the
+  Explore button opens the drawer). No auto-cycling, nothing overlaps. `HangingList` is gone.
+- **Founders = two simple cards** (`Founders`, classes `fcard*`): small round tight-crop avatar
+  (`avatar` in `founders`, files `client/public/images/founders/*-avatar.jpg`; the full photos
+  stay for the founder drawer), name, title, one line, "Talk to {name}" (Contact drawer
+  pre-routed) + mail and call icon buttons. Title/lead lines come from `story.team`. The old
+  chips, popovers, `fmark` and `story.team.sentence` use are removed (the data is still in
+  site.js). **Photos stay avatar-sized.**
+- **Nav: hamburger icon** instead of the "Menu" text (3 lines that turn into a cross; same small
+  dropdown panel; `aria-label` Open/Close menu). On phones/touch the nav controls and menu rows are
+  44px tall.
 
 **Safari / WebKit pass (2026-11-23):** tested section by section in Playwright WebKit vs Chromium
 (1440 and 390). Rules that came out of it:

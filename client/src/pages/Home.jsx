@@ -177,87 +177,6 @@ function Hero() {
   );
 }
 
-/**
- * vs-goods "MOCKUP LIBRARY" list: giant uppercase lines, the active one in ink, with a preview
- * card (mockup + caption bar) hanging off it. Auto-cycles while on screen; hover takes over and
- * the card follows the cursor. items: [{ label, accent, visual, caption, onClick }]
- */
-function HangingList({ items, interval = PHRASE_MS }) {
-  const [i, setI] = useState(0);
-  const [hovering, setHovering] = useState(false);
-  const [inView, setInView] = useState(false);
-  const [still] = useState(reduced);
-  const list = useRef(null);
-  const els = useRef([]);
-  const preview = useRef(null);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.4 });
-    io.observe(list.current);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (still || hovering || !inView) return;
-    const t = setTimeout(() => setI((n) => (n + 1) % items.length), interval);
-    return () => clearTimeout(t);
-  }, [i, hovering, inView, still, items.length, interval]);
-
-  useEffect(() => {
-    if (hovering) return;
-    const place = () => {
-      const el = els.current[i];
-      const box = list.current;
-      if (!el || !box) return;
-      const r = el.getBoundingClientRect();
-      const b = box.getBoundingClientRect();
-      const ph = preview.current?.offsetHeight || 0;
-      const y = Math.min(r.top - b.top + r.height * 0.55, b.height - ph + 12);
-      setPos({ x: r.left - b.left + r.width * 0.42, y });
-    };
-    place();
-    window.addEventListener('resize', place);
-    return () => window.removeEventListener('resize', place);
-  }, [i, hovering]);
-
-  const onMove = (e) => {
-    if (!window.matchMedia('(hover: hover)').matches) return;
-    const b = list.current.getBoundingClientRect();
-    const ph = preview.current?.offsetHeight || 0;
-    setPos({ x: e.clientX - b.left + 24, y: Math.min(e.clientY - b.top + 18, b.height - ph + 12) });
-  };
-
-  const cur = items[i];
-  return (
-    <div className={`hlist ${hovering ? 'is-hovering' : ''}`} ref={list} onPointerMove={onMove} onPointerLeave={() => setHovering(false)}>
-      {items.map((x, n) => (
-        <button
-          key={x.label}
-          ref={(el) => (els.current[n] = el)}
-          className={`hlist__item ${n === i ? 'is-active' : ''}`}
-          onPointerEnter={() => {
-            setHovering(true);
-            setI(n);
-          }}
-          onFocus={() => setI(n)}
-          onClick={x.onClick}
-        >
-          {x.label}
-        </button>
-      ))}
-      <div className="hpreview" ref={preview} style={{ transform: `translate3d(${pos.x}px, ${pos.y}px, 0)` }} aria-hidden="true">
-        <div key={i} className="hpreview__inner" data-accent={cur.accent}>
-          <div className="hpreview__media">
-            <Visual name={cur.visual} />
-          </div>
-          <div className="hpreview__caption">{cur.caption}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* 2 — Statement: words fill from grey to ink as you scroll -------------------- */
 
 function Statement() {
@@ -278,28 +197,85 @@ function Statement() {
   );
 }
 
-/* 3 — Services: the vs-goods list (moved here from the hero) -------------- */
+/* 3 — Services: a calm list with one preview card -------------------------- */
+
+const ArrowIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 function Services() {
   const { openService, openContact } = useUi();
-  const items = v3.services.map((x) => ({
-    label: x.name,
-    accent: x.accent,
-    visual: x.visual,
-    caption: x.bullets.join(' · '),
-    onClick: () => openService(x.cap),
-  }));
-  return (
-    <section id="services" className="services4">
-      <div className="wrap services4__head">
-        <p className="label">What we do</p>
-        <p className="services4__hint">Pick one to see everything we do there.</p>
+  const [i, setI] = useState(0);
+  const services = v3.services;
+  const canHover = () => window.matchMedia('(hover: hover)').matches;
+
+  // The same card is used beside the list (laptops) and inside the active row (phones).
+  const card = (x) => (
+    <>
+      <div className="svlist__media">
+        <Visual name={x.visual} />
       </div>
-      <HangingList items={items} />
-      <div className="wrap services4__foot">
-        <Button variant="dark" onClick={() => openContact()}>
-          Not sure where to start? Let’s talk
+      <div className="svlist__body">
+        <ul>
+          {x.bullets.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+        <Button variant="dark" onClick={() => openService(x.cap)}>
+          Explore {x.name}
         </Button>
+      </div>
+    </>
+  );
+
+  return (
+    <section id="services" className="svlist">
+      <div className="wrap">
+        <header className="svlist__head">
+          <p className="label">What we do</p>
+          <h2>Pick one to see everything we do there.</h2>
+        </header>
+
+        <div className="svlist__layout">
+          <ol className="svlist__rows">
+            {services.map((x, n) => (
+              <li key={x.name} className={`svlist__item ${n === i ? 'is-active' : ''}`} data-accent={x.accent}>
+                <button
+                  className="svlist__row"
+                  aria-current={n === i ? 'true' : undefined}
+                  onPointerEnter={(e) => e.pointerType === 'mouse' && setI(n)}
+                  onFocus={() => setI(n)}
+                  onClick={() => (canHover() ? openService(x.cap) : setI(n))}
+                >
+                  <span className="svlist__no">{String(n + 1).padStart(2, '0')}</span>
+                  <span className="svlist__name">{x.name}</span>
+                  <span className="svlist__go">
+                    <ArrowIcon />
+                  </span>
+                </button>
+                <div className="svlist__inline" inert={n === i ? undefined : ''}>
+                  <div className="svlist__inner">
+                    <div className="svlist__sheet">{card(x)}</div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <aside className="svlist__card" data-accent={services[i].accent} aria-label={`${services[i].name} preview`}>
+            <div key={i} className="svlist__cardin">
+              {card(services[i])}
+            </div>
+          </aside>
+        </div>
+
+        <div className="svlist__foot">
+          <Button variant="dark" onClick={() => openContact()}>
+            Not sure where to start? Let’s talk
+          </Button>
+        </div>
       </div>
     </section>
   );
@@ -451,7 +427,7 @@ function ProcessLine() {
   );
 }
 
-/* 7 — Founders: one sentence with name chips -------------------------------- */
+/* 7 — Founders: two simple cards ------------------------------------------ */
 
 const MailIcon = () => (
   <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -470,103 +446,41 @@ const PhoneIcon = () => (
   </svg>
 );
 
-function FounderChip({ f, open, setOpen, tilt }) {
-  const { openContact } = useUi();
-  const leave = useRef(null);
-  const hoverable = () => window.matchMedia('(hover: hover)').matches;
-  const isOpen = open === f.id;
-  return (
-    <span
-      className={`fname ${isOpen ? 'is-open' : ''}`}
-      data-accent={f.accent}
-      onPointerEnter={() => {
-        if (!hoverable()) return;
-        clearTimeout(leave.current);
-        setOpen(f.id);
-      }}
-      onPointerLeave={() => {
-        if (!hoverable()) return;
-        leave.current = setTimeout(() => setOpen((o) => (o === f.id ? null : o)), 180);
-      }}
-    >
-      <button
-        className="fname__chip"
-        style={{ '--tilt': tilt }}
-        aria-expanded={isOpen}
-        aria-controls={`fpop-${f.id}`}
-        onClick={() => setOpen((o) => (o === f.id ? null : f.id))}
-      >
-        <img src={f.photo} alt="" />
-        {f.name}
-      </button>
-      <span className="fpop" id={`fpop-${f.id}`} role="group" aria-label={`${f.name}, ${f.title}`}>
-        <span className="fpop__head">
-          <img src={f.photo} alt="" />
-          <span>
-            <b>{f.name}</b>
-            <small>{f.title}</small>
-          </span>
-          <button className="fpop__x" aria-label="Close" onClick={() => setOpen(null)}>
-            ×
-          </button>
-        </span>
-        <span className="fpop__line">{f.short}</span>
-        <span className="fpop__actions">
-          <Button variant="dark" onClick={() => openContact({ interest: f.id === 'dhruv' ? 'AI & Automation' : 'Creative & Marketing' })}>
-            Talk to {f.name}
-          </Button>
-          <a className="fpop__icon" href={`mailto:${f.email}`} aria-label={`Email ${f.name}`} title={f.email}>
-            <MailIcon />
-          </a>
-          <a className="fpop__icon" href={`tel:${f.tel}`} aria-label={`Call ${f.name}`} title={f.phone}>
-            <PhoneIcon />
-          </a>
-        </span>
-      </span>
-    </span>
-  );
-}
-
 function Founders() {
-  const [open, setOpen] = useState(null);
-  const [riddhi, dhruv] = founders;
-  const [s1, s2, s3] = story.team.sentence;
-  const wrap = useRef(null);
-
-  // Close on Escape or a tap outside the chips.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === 'Escape' && setOpen(null);
-    const onDown = (e) => !e.target.closest?.('.fname') && setOpen(null);
-    window.addEventListener('keydown', onKey);
-    window.addEventListener('pointerdown', onDown);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener('pointerdown', onDown);
-    };
-  }, [open]);
-
+  const { openContact } = useUi();
   return (
-    <section id="team" className="chapter founders" ref={wrap}>
-      <div className="wrap founders__layout">
+    <section id="team" className="chapter founders">
+      <div className="wrap">
         <Reveal>
-          <h2 className="label founders__eyebrow">{story.team.eyebrow}</h2>
-          <p className="founders__sentence">
-            {s1} <FounderChip f={riddhi} open={open} setOpen={setOpen} tilt="-2deg" /> {s2}{' '}
-            <FounderChip f={dhruv} open={open} setOpen={setOpen} tilt="2deg" /> {s3}
-          </p>
-          <p className="founders__foot">
-            {story.team.title} {story.team.lead}
-          </p>
-          <p className="founders__hint">
-            <span className="founders__hint--hover">Hover a name to reach them directly.</span>
-            <span className="founders__hint--tap">Tap a name to reach them directly.</span>
-          </p>
+          <p className="label founders__eyebrow">{story.team.eyebrow}</p>
+          <h2 className="founders__title">{story.team.title}</h2>
+          <p className="founders__lead">{story.team.lead}</p>
         </Reveal>
-        {/* The NTB mark splits into two halves, one per founder; the half for the open name lights up. */}
-        <div className={`fmark ${open ? `is-${open}` : ''}`} aria-hidden="true">
-          <span className="fmark__half fmark__half--a" />
-          <span className="fmark__half fmark__half--b" />
+
+        <div className="founders__cards">
+          {founders.map((f, n) => (
+            <Reveal as="article" key={f.id} delay={n * 90} className="fcard" data-accent={f.accent}>
+              <header className="fcard__head">
+                <img src={f.avatar} alt="" width="64" height="64" />
+                <div>
+                  <h3>{f.name}</h3>
+                  <p className="fcard__role">{f.title}</p>
+                </div>
+              </header>
+              <p className="fcard__line">{f.short}</p>
+              <div className="fcard__actions">
+                <Button variant="dark" onClick={() => openContact({ interest: f.id === 'dhruv' ? 'AI & Automation' : 'Creative & Marketing' })}>
+                  Talk to {f.name}
+                </Button>
+                <a className="fcard__icon" href={`mailto:${f.email}`} aria-label={`Email ${f.name}`} title={f.email}>
+                  <MailIcon />
+                </a>
+                <a className="fcard__icon" href={`tel:${f.tel}`} aria-label={`Call ${f.name}`} title={f.phone}>
+                  <PhoneIcon />
+                </a>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>

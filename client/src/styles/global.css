@@ -340,16 +340,49 @@ h3 {
   box-shadow: 0 0 0 3px rgba(134, 217, 138, 0.25);
 }
 .nav__menu {
+  display: grid;
+  place-items: center;
+  width: 40px;
   height: 40px;
-  padding: 0 14px;
+  padding: 0;
   border-radius: 10px;
   background: rgba(248, 245, 239, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: inset 0 0 0 1px var(--line);
-  font-size: 13.5px;
-  font-weight: 500;
-  min-width: 70px;
+}
+/* Hamburger: three short lines that turn into a cross while the panel is open */
+.nav__bars {
+  position: relative;
+  width: 18px;
+  height: 12px;
+}
+.nav__bars i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: transform 0.35s var(--ease), opacity 0.2s;
+}
+.nav__bars i:nth-child(1) {
+  top: 0;
+}
+.nav__bars i:nth-child(2) {
+  top: 5px;
+}
+.nav__bars i:nth-child(3) {
+  top: 10px;
+}
+.nav__menu[aria-expanded='true'] .nav__bars i:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+.nav__menu[aria-expanded='true'] .nav__bars i:nth-child(2) {
+  opacity: 0;
+}
+.nav__menu[aria-expanded='true'] .nav__bars i:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
 }
 @media (max-width: 560px) {
   .nav__word {
@@ -438,6 +471,21 @@ h3 {
   border-radius: 6px;
   background: var(--green);
   color: #10300f;
+}
+/* Phones and touch screens: nav controls and menu rows reach 44px */
+@media (max-width: 560px), (pointer: coarse) {
+  .nav__logo,
+  .nav__talk {
+    height: 44px;
+  }
+  .nav__menu {
+    width: 44px;
+    height: 44px;
+  }
+  .dropdown__row {
+    height: 44px;
+    font-size: 14px;
+  }
 }
 
 
@@ -743,132 +791,182 @@ h3 {
   .sticker:nth-child(4) { left: 56% !important; top: 46% !important; }
 }
 
-/* vs-goods list + hanging preview (used by the services section) */
-.hlist {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  width: 100%;
+/* Services v6: a calm list with one preview card ---------------------------- */
+.svlist {
+  padding: clamp(72px, 9vw, 120px) 0 clamp(72px, 9vw, 112px);
+  background: var(--paper);
 }
-.hlist__item {
+.svlist__head {
+  display: grid;
+  gap: 14px;
+  max-width: 640px;
+  margin-bottom: clamp(28px, 4vw, 52px);
+}
+.svlist__head .label {
+  color: var(--muted);
+}
+.svlist__head h2 {
   font-family: var(--display);
+  font-size: clamp(30px, 3.6vw, 48px);
   font-weight: 500;
-  font-size: clamp(36px, 7vw, 116px);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
-  text-transform: uppercase;
-  color: rgba(37, 37, 37, 0.17);
-  white-space: nowrap;
-  transition: color 0.35s var(--ease);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
-.hlist__item.is-active {
-  color: var(--ink);
-}
-
-/* Preview card hanging off the active line (vs-goods "MOCKUP LIBRARY") */
-.hpreview {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  width: clamp(240px, 24vw, 360px);
-  pointer-events: none;
-  transition: transform 0.55s var(--ease);
-}
-.hlist.is-hovering .hpreview {
-  transition: transform 0.18s linear;
-}
-.hpreview__inner {
+.svlist__layout {
   display: grid;
-  gap: 6px;
-  text-align: center;
-  animation: previewPop 0.45s var(--spring) both;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
 }
-@keyframes previewPop {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(8px);
-  }
+.svlist__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
 }
-.hpreview__media {
+.svlist__item {
+  border-bottom: 1px solid var(--line);
+}
+.svlist__row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 76px;
+  padding: 14px 4px;
+  text-align: left;
+  color: var(--muted);
+  transition: color 0.25s var(--ease), padding 0.35s var(--ease), box-shadow 0.25s;
+}
+.svlist__no {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.svlist__name {
+  font-family: var(--display);
+  font-size: clamp(24px, 2.6vw, 36px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.svlist__go {
   display: grid;
   place-items: center;
-  aspect-ratio: 16 / 10;
-  padding: 10% 14%;
-  border-radius: 16px;
-  background: var(--accent);
-  box-shadow: 0 30px 60px -30px rgba(37, 37, 37, 0.55);
-  overflow: hidden;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background 0.25s, color 0.25s, box-shadow 0.25s;
 }
-.hpreview__media .v {
+.svlist__item.is-active .svlist__row {
+  padding-left: 16px;
+  color: var(--ink);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+.svlist__item.is-active .svlist__go {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+.svlist__row:focus-visible {
+  outline-offset: -3px;
+}
+
+/* the one preview card: mockup on the service colour, three lines, one button */
+.svlist__card {
+  position: sticky;
+  top: 96px;
+}
+.svlist__cardin,
+.svlist__sheet {
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--white);
+  box-shadow: 0 30px 60px -38px rgba(37, 37, 37, 0.45), inset 0 0 0 1px var(--line);
+}
+.svlist__cardin {
+  animation: svIn 0.45s var(--ease) both;
+}
+@keyframes svIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.svlist__media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  padding: 8% 14%;
+  background: var(--accent);
+}
+.svlist__media .v {
   rotate: -3deg;
   box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.35);
 }
-.hpreview__media .v-reel {
+.svlist__media .v-reel {
   width: 28%;
 }
-.hpreview__caption {
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-size: 14px;
-  font-weight: 500;
+.svlist__body {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  padding: 20px 24px 24px;
 }
-@media (hover: none), (max-width: 760px) {
-  .hpreview {
-    position: relative;
-    transform: none !important;
-    width: min(320px, 86%);
-    margin-top: 18px;
-    transition: none;
-  }
+.svlist__body ul {
+  display: grid;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
 }
-@media (max-width: 760px) {
-  .hlist__item {
-    font-size: clamp(26px, 8.6vw, 52px);
-    white-space: normal;
-    text-align: center;
-  }
+.svlist__body li {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.svlist__body li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.svlist__foot {
+  margin-top: clamp(32px, 4vw, 56px);
+}
+.svlist__inline {
+  display: none;
 }
 
-/* Services v5: the list on a grid, centred */
-.services4 {
-  position: relative;
-  padding: clamp(72px, 10vw, 128px) 0 clamp(72px, 10vw, 120px);
-  background-color: var(--paper-2);
-  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 48px 48px;
-  overflow: hidden;
-}
-.services4::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(75% 65% at 50% 50%, transparent 40%, var(--paper-2) 100%);
-  pointer-events: none;
-}
-.services4 > * {
-  position: relative;
-}
-.services4__head {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  margin-bottom: clamp(20px, 3vw, 36px);
-  text-align: center;
-}
-.services4__head .label {
-  color: var(--muted);
-}
-.services4__hint {
-  font-size: 14px;
-  color: var(--muted);
-}
-.services4__foot {
-  display: flex;
-  justify-content: center;
-  margin-top: clamp(28px, 4vw, 48px);
+/* Phones and narrow windows: the preview opens inside the picked row */
+@media (max-width: 899px) {
+  .svlist__layout {
+    grid-template-columns: 1fr;
+  }
+  .svlist__card {
+    display: none;
+  }
+  .svlist__row {
+    min-height: 68px;
+  }
+  .svlist__inline {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows 0.45s var(--ease), visibility 0s 0.45s;
+  }
+  .svlist__item.is-active .svlist__inline {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows 0.45s var(--ease), visibility 0s;
+  }
+  .svlist__inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .svlist__sheet {
+    margin: 2px 0 20px;
+  }
 }
 
 /* Mockup visuals ----------------------------------------------------------- */
@@ -1480,237 +1578,95 @@ h3 {
   font-size: 14px;
 }
 
-/* Founders: one sentence with name chips (v2.6) */
+/* Founders v6: two simple cards ------------------------------------------- */
 .founders__eyebrow {
+  margin-bottom: 18px;
   color: var(--muted);
-  margin-bottom: 22px;
-  font-weight: 500;
 }
-.founders__sentence {
-  max-width: 1120px;
-  font-size: clamp(30px, 4.4vw, 66px);
-  line-height: 1.22;
-  letter-spacing: -0.035em;
+.founders__title {
+  max-width: 20ch;
+  font-family: var(--display);
+  font-size: clamp(30px, 3.6vw, 48px);
   font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
-.founders__foot {
-  margin-top: clamp(24px, 3vw, 36px);
+.founders__lead {
+  margin-top: 14px;
+  font-size: 17px;
+  color: var(--muted);
+}
+.founders__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: clamp(28px, 4vw, 48px);
+}
+.fcard {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: clamp(22px, 3vw, 32px);
+  border-radius: 22px;
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.fcard__head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.fcard__head img {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px var(--white), 0 0 0 5px var(--accent);
+}
+.fcard__head h3 {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.fcard__role {
+  margin-top: 3px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.fcard__line {
+  max-width: 40ch;
   font-size: 16px;
-  color: var(--muted);
-  max-width: 52ch;
+  line-height: 1.5;
 }
-.founders__hint {
-  display: inline-flex;
+.fcard__actions {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 14px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
-  font-size: 13px;
-  font-weight: 500;
+  margin-top: 4px;
 }
-.founders__hint::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #3fae4a;
-  box-shadow: 0 0 0 3px rgba(63, 174, 74, 0.2);
-}
-.founders__hint--tap {
-  display: none;
-}
-@media (hover: none), (max-width: 640px) {
-  .founders__hint--hover {
-    display: none;
-  }
-  .founders__hint--tap {
-    display: inline;
-  }
-}
-.fname {
-  position: relative;
-  display: inline-block;
-  white-space: nowrap;
-}
-.fname.is-open {
-  z-index: 40; /* the open card sits above the other name chip */
-}
-.fname__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.22em;
-  padding: 0.06em 0.3em 0.1em 0.1em;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font: inherit;
-  letter-spacing: inherit;
-  line-height: 1.05;
-  rotate: var(--tilt);
-  box-shadow: 0 0.12em 0.3em -0.14em rgba(34, 36, 35, 0.5);
-  transition: rotate 0.4s var(--spring), transform 0.4s var(--spring);
-}
-.fname__chip img {
-  width: 0.92em;
-  height: 0.92em;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 18%;
-  box-shadow: 0 0 0 0.05em rgba(255, 255, 255, 0.7);
-}
-.fname.is-open .fname__chip {
-  rotate: 0deg;
-  transform: translateY(-0.04em) scale(1.03);
-}
-@media (hover: hover) {
-  .fname:hover .fname__chip {
-    rotate: 0deg;
-    transform: translateY(-0.04em) scale(1.03);
-  }
-}
-.fname__chip:focus-visible {
-  outline-offset: 4px;
-}
-
-.fpop {
-  position: absolute;
-  z-index: 30;
-  left: 0;
-  top: calc(100% + 14px);
-  width: 340px;
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-  border-radius: 18px;
-  background: var(--paper);
-  box-shadow: 0 30px 60px -28px rgba(34, 36, 35, 0.55), 0 0 0 1px var(--line);
-  font-size: 15px;
-  line-height: 1.45;
-  letter-spacing: 0;
-  white-space: normal;
-  text-align: left;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px) scale(0.97);
-  transform-origin: top left;
-  transition: opacity 0.2s, transform 0.35s var(--spring), visibility 0s linear 0.35s;
-}
-.fname.is-open .fpop {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition: opacity 0.2s, transform 0.35s var(--spring);
-}
-.fpop::before {
-  /* little pointer toward the chip */
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: 28px;
-  width: 12px;
-  height: 12px;
-  rotate: 45deg;
-  background: var(--paper);
-  box-shadow: -1px -1px 0 var(--line);
-}
-.fpop__head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.fpop__head img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 18%;
-  box-shadow: 0 0 0 2px var(--accent);
-}
-.fpop__head b {
-  display: block;
-  font-size: 16px;
-  font-weight: 500;
-}
-.fpop__head small {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-}
-.fpop__x {
-  display: none;
-  margin-left: auto;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: var(--canvas);
-  font-size: 18px;
-  line-height: 1;
-}
-.fpop__line {
-  color: var(--ink-2);
-}
-.fpop__actions {
-  display: flex;
-  gap: 6px;
-}
-.fpop__actions .btn {
-  flex: 1;
-  min-width: 0;
-}
-.fpop__icon {
+.fcard__icon {
   display: grid;
   place-items: center;
-  flex: none;
   width: 44px;
   height: 44px;
-  border-radius: var(--r);
-  background: var(--white);
+  border-radius: 12px;
+  background: var(--paper);
   box-shadow: inset 0 0 0 1px var(--line);
   transition: background 0.2s, color 0.2s;
 }
 @media (hover: hover) {
-  .fpop__icon:hover {
+  .fcard__icon:hover {
     background: var(--ink);
     color: var(--paper);
   }
 }
-/* the second chip sits further right; open its card toward the left */
-.fname:nth-of-type(2) .fpop {
-  left: auto;
-  right: 0;
-  transform-origin: top right;
-}
-.fname:nth-of-type(2) .fpop::before {
-  left: auto;
-  right: 28px;
-}
-
-/* Touch screens: the card becomes a small sheet at the bottom of the screen. */
-@media (hover: none), (max-width: 640px) {
-  .fpop,
-  .fname:nth-of-type(2) .fpop {
-    position: fixed;
-    left: 10px;
-    right: 10px;
-    top: auto;
-    bottom: 10px;
-    width: auto;
-    z-index: 70;
-    transform: translateY(24px);
-    transform-origin: bottom center;
-    box-shadow: 0 -10px 40px -16px rgba(34, 36, 35, 0.45), 0 0 0 1px var(--line);
-  }
-  .fname.is-open .fpop {
-    transform: none;
-  }
-  .fpop::before {
-    display: none;
-  }
-  .fpop__x {
-    display: grid;
-    place-items: center;
+@media (max-width: 720px) {
+  .founders__cards {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2084,56 +2040,6 @@ h3 {
   .pline__dot {
     top: 2px;
     left: -34px;
-  }
-}
-
-/* Founders: mark that splits into two halves */
-.founders__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(160px, 18vw, 260px);
-  gap: clamp(24px, 4vw, 64px);
-  align-items: center;
-}
-.founders__sentence {
-  font-family: var(--display);
-  font-weight: 500;
-}
-.fmark {
-  position: relative;
-  aspect-ratio: 640 / 347;
-}
-.fmark__half {
-  position: absolute;
-  inset: 0;
-  background: rgba(37, 37, 37, 0.85);
-  -webkit-mask: url('/brand/ntb-mark-ink.png') center / contain no-repeat;
-  mask: url('/brand/ntb-mark-ink.png') center / contain no-repeat;
-  transition: transform 0.6s var(--spring), background 0.4s var(--ease);
-}
-.fmark__half--a {
-  clip-path: inset(0 50% 0 0);
-}
-.fmark__half--b {
-  clip-path: inset(0 0 0 50%);
-}
-.fmark.is-riddhi .fmark__half--a {
-  background: var(--terracotta);
-  transform: translateX(-10px) rotate(-4deg);
-}
-.fmark.is-dhruv .fmark__half--b {
-  background: var(--periwinkle);
-  transform: translateX(10px) rotate(4deg);
-}
-.fmark.is-riddhi .fmark__half--b,
-.fmark.is-dhruv .fmark__half--a {
-  background: rgba(37, 37, 37, 0.22);
-}
-@media (max-width: 760px) {
-  .founders__layout {
-    grid-template-columns: 1fr;
-  }
-  .fmark {
-    display: none;
   }
 }
 

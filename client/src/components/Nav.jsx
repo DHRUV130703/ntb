@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { chapters } from '../content/site.js';
 import { useUi } from '../state/ui.jsx';
 
-/** v3 (jeppesen-style): mark + wordmark left; "Talk to the founders" + Menu right. */
+/** v3 (jeppesen-style): mark + wordmark left; "Talk to the founders" + a hamburger right (v6). */
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const { openContact } = useUi();
@@ -43,8 +43,12 @@ export default function Nav() {
           <span className="nav__dot" aria-hidden="true" />
           Talk to the founders
         </button>
-        <button className="nav__menu" aria-expanded={open} aria-controls="nav-menu" onClick={() => setOpen((o) => !o)}>
-          {open ? 'Close' : 'Menu'}
+        <button className="nav__menu" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="nav-menu" onClick={() => setOpen((o) => !o)}>
+          <span className="nav__bars" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
         </button>
 
         <div id="nav-menu" className={`dropdown ${open ? 'is-open' : ''}`} inert={open ? undefined : ''}>
