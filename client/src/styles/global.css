@@ -775,9 +775,17 @@ h3 {
   }
 }
 @media (max-width: 760px) {
+  .hero3 {
+    /* The sticker band's height follows the screen height, and the hero reserves exactly that
+       much room above the headline, so the tags can never run into it (short screens, e.g.
+       Chrome with its toolbars showing, used to push the headline up into them). */
+    --band: 140px;
+    --band: clamp(112px, 17svh, 150px);
+    padding-top: calc(76px + var(--band) + 28px);
+  }
   .stickers {
     inset: 76px 0 auto 0;
-    height: 150px;
+    height: var(--band);
   }
   .sticker {
     translate: none; /* phone positions below are hand-placed */
@@ -2815,16 +2823,16 @@ h3 {
   }
 }
 @media (max-width: 560px) {
-  /* slim consent card on phones: headline + two buttons, no paragraph */
+  /* consent card on phones: headline above two equal buttons; labels wrap, never get cut */
   .cookie {
     display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
+    grid-template-columns: 1fr;
     gap: 10px;
+    padding: 12px 14px 14px;
     text-align: left;
   }
   .cookie__title {
-    font-size: 20px;
+    font-size: 22px;
     margin: 0;
   }
   .cookie__chip {
@@ -2832,25 +2840,27 @@ h3 {
   }
   .cookie__actions {
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 8px;
+  }
+  .cookie__actions .btn {
+    height: auto;
+    min-height: 44px;
+    white-space: normal;
   }
   .cookie__actions .btn__arrow {
     display: none;
   }
   .cookie__actions .btn__label {
     justify-content: center;
-    padding: 0 8px;
-    font-size: 12.5px;
+    padding: 8px;
+    font-size: 14px;
+    line-height: 1.15;
+    text-align: center;
   }
   .cookie__actions .btn--dark-pink .btn__label::after {
     content: '';
   }
   .cookie__note {
     display: none;
-  }
-}
-@media (max-width: 380px) {
-  .cookie {
-    grid-template-columns: 1fr;
   }
 }

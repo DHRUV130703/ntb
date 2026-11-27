@@ -180,6 +180,13 @@ phrase tabs and footer links have ≥44px tap targets; slim two-button cookie ca
 paragraph); stickers anchored with `translate: calc(var(--x) * -1%)` so they never overflow;
 statement and closing get less vertical padding; AI card shows only the dashboard on phones.
 
+**Mobile fixes (2026-11-27, phones only, ≤760px / ≤560px):**
+- Hero stickers: the sticker band height is `--band: clamp(112px, 17svh, 150px)` and the hero's
+  top padding is `76px + --band + 28px`, so the headline can never run into the tags on short
+  screens (Chrome with its toolbars showing did). Checked at 10 sizes from 320×568 to 430×932.
+- Cookie card on phones: stacked (headline above two equal buttons), button labels wrap instead of
+  being clipped ("Reject non-essential" was cut off); min button height 44px.
+
 **v6 (2026-11-26, current for Services, Founders and the nav menu).** The founders called the
 giant services list with a card hanging over the text "too messy" on mobile and laptop, the
 "Menu" text button unnecessary, and the founders sentence (name chips, hover popovers, split NTB
